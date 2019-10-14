@@ -7,9 +7,9 @@ elseif($type=='get_theatrical_plays') get_theatrical_plays();
 elseif($type=='costumeExists') costume_exists();
 elseif($type=='insertUse') insertUse();
 elseif($type=='existsUse') use_exists();
+elseif($type=='insertTP') insert_theatrical_plays();
 
 function insertCostume() {
-    
     require 'config.php';
     $json = json_decode(file_get_contents('php://input'), true);
     $name = $json['name'];
@@ -146,6 +146,35 @@ function get_theatrical_plays(){
     $TPData = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $TPData = json_encode($TPData);
     echo '{"TPData":'.$TPData.'}';
+}
+
+function insert_theatrical_plays(){
+    require 'config.php';
+    $json = json_decode(file_get_contents('php://input'),true);
+    $title = $json['name'];
+    $theater=$json['theater'];
+    $date=$json['date'];
+    $actors=$json['actors'];
+    $director=$json['director'];
+    $tpData='';
+
+    $result = $db->query("select * from theatrical_plays where title='$title'");
+    $rowCount=$result->num_rows;
+
+    if($rowCount==0){
+        $db->query("INSERT INTO theatrical_plays(title, date, actors, director, theater)
+        VALUES('$title', '$date', '$actors', '$director', '$theater')");        
+        $tpData ='';
+        $query = "select * from theatrical_plays where title='$title'";
+        $result= $db->query($query);
+        $tpData = $result->fetch_object();
+        $theatrical_play_id=$tpData->theatrical_play_id;
+        $tpData = json_encode($tpData);
+        echo '{"tpData":'.$tpData.'}';
+    }
+    else{
+        echo '{"error":" Use name exists"}';
+    }
 }
 
 function get_accessories(){
