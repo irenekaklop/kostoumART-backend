@@ -8,6 +8,7 @@ elseif($type=='costumeExists') costume_exists();
 elseif($type=='insertUse') insertUse();
 elseif($type=='existsUse') use_exists();
 elseif($type=='insertTP') insert_theatrical_plays();
+elseif($type=='deleteCostume') deleteCostume();
 
 function insertCostume() {
     require 'config.php';
@@ -103,23 +104,16 @@ function insertUse(){
     $description = $json['description'];
     $customs = $json["customs"];
     $useData='';
-    $result = $db->query("select * from uses where name='$name'");
-    $rowCount=$result->num_rows;
-
-    if($rowCount==0){
-        $db->query("INSERT INTO uses(name, use_category, description, customs)
-        VALUES('$name', '$use_category', '$description', '$customs')");                
-        $useData ='';
-        $query = "select * from uses where name='$name'";
-        $result= $db->query($query);
-        $useData = $result->fetch_object();
-        $useID=$useData->useID;
-        $useData = json_encode($useData);
-        echo '{"useData":'.$useData.'}';
-    }
-    else{
-        echo '{"error":" Use name exists"}';
-    }
+    
+    $db->query("INSERT INTO uses(name, use_category, description, customs)
+    VALUES('$name', '$use_category', '$description', '$customs')");                
+    $useData ='';
+    $query = "select * from uses where name='$name'";
+    $result= $db->query($query);
+    $useData = $result->fetch_object();
+    $useID=$useData->useID;
+    $useData = json_encode($useData);
+    echo '{"useData":'.$useData.'}';
 }
 
 function use_exists(){
@@ -190,14 +184,13 @@ function get_accessories(){
 function deleteCostume(){
     require 'config.php';
     $json = json_decode(file_get_contents('php://input'), true);
-    $costume_id=$json['costume_id'];
+    $costume_id=$json['selectedCostumeId'];
     $query = "DELETE FROM costumes WHERE costume_id=$costume_id";
     $result = $db->query($query);
+    $deleted = false;
     if($result){
-        echo '{"success":"Feed deleted"}';
+        $deleted=true;
     }
-    else{
-        echo '{"error":"Delete error"}';
-    }
+    echo '{"deleted":'.$deleted.'}';
 }
 ?>
