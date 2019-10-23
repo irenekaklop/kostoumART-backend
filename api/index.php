@@ -23,7 +23,7 @@ function insertCostume() {
     $location = $json['location'];
     $location_influence = $json['location_influence'];
     $designer = $json['designer'];
-    //$theatrical_play = $json['tp_value'];
+    $theatrical_play = $json['tp_value'];
     $parts=$json['parts'];
        
     $costumeData = ''; 
@@ -39,14 +39,13 @@ function insertCostume() {
     /*$res_tp = $db->query("SELECT * FROM theatrical_plays WHERE title='$theatrical_play'");
     $tp = $res_tp->fetch_object();
     $tp_id = $tp->theatrical_play_id;*/
-
     $result = $db->query("select * from costumes where name='$name'");
     $rowCount=$result->num_rows;
     if($rowCount==0){
         $db->query("INSERT INTO costumes(name, description, costume_use, sex, useID, material, technique,
-         designer, location, location_influence, actors, parts)
+         designer, location, location_influence, actors, parts, theatrical_play)
         VALUES('$name','$description','$use', '$sex', $useID, '$material', '$technique', '$designer',
-        '$location','$location_influence','$actors','$parts')");                
+        '$location','$location_influence','$actors','$parts', '$theatrical_play')");                
         $costumeData ='';
         $query = "select * from costumes where name='$name'";
         $result= $db->query($query);
