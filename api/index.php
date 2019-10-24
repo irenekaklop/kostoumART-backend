@@ -9,6 +9,7 @@ elseif($type=='insertUse') insertUse();
 elseif($type=='existsUse') use_exists();
 elseif($type=='insertTP') insert_theatrical_plays();
 elseif($type=='deleteCostume') deleteCostume();
+elseif($type == 'existTP') tp_exists();
 
 function insertCostume() {
     require 'config.php';
@@ -39,24 +40,18 @@ function insertCostume() {
     /*$res_tp = $db->query("SELECT * FROM theatrical_plays WHERE title='$theatrical_play'");
     $tp = $res_tp->fetch_object();
     $tp_id = $tp->theatrical_play_id;*/
-    $result = $db->query("select * from costumes where name='$name'");
-    $rowCount=$result->num_rows;
-    if($rowCount==0){
-        $db->query("INSERT INTO costumes(name, description, costume_use, sex, useID, material, technique,
-         designer, location, location_influence, actors, parts, theatrical_play)
-        VALUES('$name','$description','$use', '$sex', $useID, '$material', '$technique', '$designer',
-        '$location','$location_influence','$actors','$parts', '$theatrical_play')");                
-        $costumeData ='';
-        $query = "select * from costumes where name='$name'";
-        $result= $db->query($query);
-        $costumeData = $result->fetch_object();
-        $costume_id=$costumeData->costume_id;
-        $costumeData = json_encode($costumeData);
-        echo '{"costumeData":'.$costumeData.'}';
-        } 
-    else {
-        echo '{"error":" Costume name exists"}';
-    }
+    
+    $db->query("INSERT INTO costumes(name, description, costume_use, sex, useID, material, technique,
+    designer, location, location_influence, actors, parts, theatrical_play)
+    VALUES('$name','$description','$use', '$sex', $useID, '$material', '$technique', '$designer',
+    '$location','$location_influence','$actors','$parts', '$theatrical_play')");                
+    $costumeData ='';
+    $query = "select * from costumes where name='$name'";
+    $result= $db->query($query);
+    $costumeData = $result->fetch_object();
+    $costume_id=$costumeData->costume_id;
+    $costumeData = json_encode($costumeData);
+    echo '{"costumeData":'.$costumeData.'}';
 }
 
 function costume_exists(){
@@ -170,6 +165,21 @@ function insert_theatrical_plays(){
     }
 }
 
+function tp_exists(){
+    require 'config.php';
+    $json = json_decode(file_get_contents('php://input'),true);
+
+    $name = $json['name'];
+    $result = $db->query("select * from theatrical_plays where title='$name'");
+    $rowCount = $result->num_rows;
+    if($rowCount == 0){
+        echo '{"exists":"false"}';
+    }
+    else{
+        echo '{"exists":"true"}';
+    }
+}
+
 function get_accessories(){
     require 'config.php';
     $json = json_decode(file_get_contents('php://input'),true);
@@ -183,8 +193,8 @@ function get_accessories(){
 function deleteCostume(){
     require 'config.php';
     $json = json_decode(file_get_contents('php://input'), true);
-    $costume_id=$json['selectedCostumeId'];
-    $query = "DELETE FROM costumes WHERE costume_id=$costume_id";
+    $costume_name=$json['selectedCostumeName'];
+    $query = "DELETE FROM costumes WHERE name='$costume_name'";
     $result = $db->query($query);
     $deleted = false;
     if($result){
