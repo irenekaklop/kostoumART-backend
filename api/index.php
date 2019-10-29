@@ -3,12 +3,16 @@ $type = $_GET['tp'];
 if($type=='insertCostume') insertCostume(); 
 elseif($type=='costumes') costumes();
 elseif($type=='get_uses') get_uses();
+elseif($type=='get_all_uses') get_all_uses();
 elseif($type=='get_theatrical_plays') get_theatrical_plays();
+elseif($type=='get_all_theatrical_plays') get_all_theatrical_plays();
 elseif($type=='costumeExists') costume_exists();
 elseif($type=='insertUse') insertUse();
 elseif($type=='existsUse') use_exists();
 elseif($type=='insertTP') insert_theatrical_plays();
 elseif($type=='deleteCostume') deleteCostume();
+elseif($type=='delete_use') deleteUse();
+elseif($type=='delete_tp') deleteTP();
 elseif($type == 'existTP') tp_exists();
 
 function insertCostume() {
@@ -26,7 +30,6 @@ function insertCostume() {
     $designer = $json['designer'];
     $theatrical_play = $json['tp_value'];
     $parts=$json['parts'];
-       
     $costumeData = ''; 
     $u='';
     $tp='';
@@ -37,16 +40,16 @@ function insertCostume() {
     $useID = $u->useID;
         
     /*Get Theatrical Play id*/
-    /*$res_tp = $db->query("SELECT * FROM theatrical_plays WHERE title='$theatrical_play'");
+    $res_tp = $db->query("SELECT * FROM theatrical_plays WHERE title='$theatrical_play'");
     $tp = $res_tp->fetch_object();
-    $tp_id = $tp->theatrical_play_id;*/
+    $tp_id = $tp->theatrical_play_id;
     
-    $db->query("INSERT INTO costumes(name, description, costume_use, sex, useID, material, technique,
-    designer, location, location_influence, actors, parts, theatrical_play)
-    VALUES('$name','$description','$use', '$sex', $useID, '$material', '$technique', '$designer',
-    '$location','$location_influence','$actors','$parts', '$theatrical_play')");                
+    $db->query("INSERT INTO costumes(costume_name, description, sex, material, technique,
+    designer, location, location_influence, actors, parts, useID, theatrical_play_id)
+    VALUES('$name','$description', '$sex', '$material', '$technique', '$designer',
+    '$location','$location_influence','$actors','$parts',  $useID, $tp_id)");                
     $costumeData ='';
-    $query = "select * from costumes where name='$name'";
+    $query = "select * from costumes where costume_name='$name'";
     $result= $db->query($query);
     $costumeData = $result->fetch_object();
     $costume_id=$costumeData->costume_id;
@@ -57,10 +60,8 @@ function insertCostume() {
 function costume_exists(){
     require 'config.php';
     $json = json_decode(file_get_contents('php://input'),true);
-
     $name = $json['name'];
-
-    $result = $db->query("select * from costumes where name='$name'");
+    $result = $db->query("select * from costumes where costume_name='$name'");
     $rowCount = $result->num_rows;
     if($rowCount == 0){
         echo '{"exists":"false"}';
@@ -73,16 +74,32 @@ function costume_exists(){
 function costumes(){
     require 'config.php';
     $json = json_decode(file_get_contents('php://input'),true);
-    $query = "SELECT * FROM costumes";
+    $result = $db->query("DELETE FROM costumes where costume_name = '';");
+    $query = "SELECT costumes.costume_name, costumes.description, costumes.sex, 
+    uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, 
+    theatrical_plays.title as tp_title, costumes.parts, costumes.actors
+    FROM costumes INNER JOIN uses ON costumes.useID = uses.useID INNER JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id;";
     $result = $db->query($query);
     $costumeData = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $costumeData = json_encode($costumeData);
     echo '{"costumeData":'.$costumeData.'}';
 }
 
+function get_all_uses(){
+    require 'config.php';
+    $json =  json_decode(file_get_contents('php://input'),true);
+    $result = $db->query("DELETE FROM uses where name = '';");
+    $query = "SELECT * FROM uses";
+    $result = $db->query($query);
+    $usesData = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $usesData = json_encode($usesData);
+    echo '{"usesData":'.$usesData.'}';
+}
+
 function get_uses(){
     require 'config.php';
     $json =  json_decode(file_get_contents('php://input'),true);
+    $result = $db->query("DELETE FROM uses where name = '';");
     $query = "SELECT name, use_category FROM uses";
     $result = $db->query($query);
     $usesData = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -129,11 +146,23 @@ function use_exists(){
 function get_theatrical_plays(){
     require 'config.php';
     $json = json_decode(file_get_contents('php://input'),true);
+    $result = $db->query("DELETE FROM theatrical_plays where title = '';");
     $query = "SELECT title FROM theatrical_plays";
     $result = $db->query($query);
     $TPData = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $TPData = json_encode($TPData);
     echo '{"TPData":'.$TPData.'}';
+}
+
+function get_all_theatrical_plays(){
+    require 'config.php';
+    $json = json_decode(file_get_contents('php://input'),true);
+    $result = $db->query("DELETE FROM theatrical_plays where title = '';");
+    $query = "SELECT * FROM theatrical_plays";
+    $result = $db->query($query);
+    $TPData = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $TPData = json_encode($TPData);
+    echo '{"TPsData":'.$TPData.'}';
 }
 
 function insert_theatrical_plays(){
@@ -194,7 +223,7 @@ function deleteCostume(){
     require 'config.php';
     $json = json_decode(file_get_contents('php://input'), true);
     $costume_name=$json['selectedCostumeName'];
-    $query = "DELETE FROM costumes WHERE name='$costume_name'";
+    $query = "DELETE FROM costumes WHERE costume_name='$costume_name'";
     $result = $db->query($query);
     $deleted = false;
     if($result){
@@ -202,4 +231,33 @@ function deleteCostume(){
     }
     echo '{"deleted":'.$deleted.'}';
 }
+
+function deleteUse(){
+    require 'config.php';
+    $json = json_decode(file_get_contents('php://input'), true);
+    $use_name=$json["selectedUseName"];
+    $query = "DELETE FROM uses WHERE name='$use_name'";
+    $result = $db->query($query);
+    $deleted = false;
+    if($result){
+        $deleted=true;
+    }
+    echo '{"deleted":'.$deleted.'}';
+}
+
+
+function deleteTP(){
+    require 'config.php';
+    $json = json_decode(file_get_contents('php://input'), true);
+    $name=$json['selectedTPName'];
+    $query = "DELETE FROM theatrical_plays WHERE title='$name'";
+    $result = $db->query($query);
+    $deleted = false;
+    if($result){
+        $deleted=true;
+    }
+    echo '{"deleted":'.$deleted.'}';
+}
+
+
 ?>
