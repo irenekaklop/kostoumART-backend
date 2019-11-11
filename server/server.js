@@ -48,7 +48,7 @@ app.get('/costumes',(req, res) => {
   });
    
 //show single costume
-app.get('/costumes/:id',(req, res) => {
+app.get('/costumes/:id', (req, res) => {
     let sql = "SELECT * FROM costumes WHERE costume_id="+req.params.id;
     let query = dbConn.query(sql, (err, results) => {
       if(err) throw err;
@@ -67,7 +67,17 @@ app.post('/costumes',(req, res) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
     });
-  });
+});
+
+//delete costume
+app.delete('/costumes', function (req, res) {
+   console.log(req);
+   let sql = 'DELETE FROM costumes WHERE costume_name = ?';
+   let query = dbConn.query(sql, [req.query.name], function (error, results, fields) {
+	  if (error) throw error;
+	  res.send('Record has been deleted!');
+	});
+});
 
 /*USES*/
 //show all uses
@@ -87,6 +97,15 @@ app.post('/uses', (req, res) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
     });
+});
+
+//delete use
+app.delete('/uses', function (req, res) {
+  console.log(req.body);
+  connection.query('DELETE FROM uses WHERE id = ?', [req.body.id], function (error, results, fields) {
+   if (error) throw error;
+   res.end('Record has been deleted!');
+ });
 });
 
 /*THEATRICAL PLAYS*/
@@ -110,5 +129,13 @@ app.post('/tps', (req, res) => {
     });
 });
 
+//delete use
+app.delete('/tps', function (req, res) {
+  console.log(req.body);
+  connection.query('DELETE FROM theatrical_plays WHERE id = ?', [req.body.id], function (error, results, fields) {
+   if (error) throw error;
+   res.end('Record has been deleted!');
+ });
+});
 
 module.exports = app;
