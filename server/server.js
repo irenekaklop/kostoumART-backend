@@ -102,7 +102,8 @@ app.post('/uses', (req, res) => {
 //delete use
 app.delete('/uses', function (req, res) {
   console.log(req.body);
-  connection.query('DELETE FROM uses WHERE id = ?', [req.body.id], function (error, results, fields) {
+  let sql = 'DELETE FROM uses WHERE id = ?';
+  dbConn.query(sql , [req.body.id], function (error, results, fields) {
    if (error) throw error;
    res.end('Record has been deleted!');
  });
@@ -132,7 +133,8 @@ app.post('/tps', (req, res) => {
 //delete use
 app.delete('/tps', function (req, res) {
   console.log(req.body);
-  connection.query('DELETE FROM theatrical_plays WHERE id = ?', [req.body.id], function (error, results, fields) {
+  let sql = 'DELETE FROM theatrical_plays WHERE id = ?';
+  dbConn.query(sql, [req.body.id], function (error, results, fields) {
    if (error) throw error;
    res.end('Record has been deleted!');
  });
