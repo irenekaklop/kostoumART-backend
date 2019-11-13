@@ -99,6 +99,15 @@ app.post('/uses', (req, res) => {
     });
 });
 
+//show single use
+app.get('/uses/:id', (req, res) => {
+  let sql = "SELECT * FROM uses WHERE useID="+req.params.id;
+  let query = dbConn.query(sql, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  });
+});
+
 //delete use
 app.delete('/uses', function (req, res) {
   console.log(req.body);
