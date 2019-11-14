@@ -23,14 +23,14 @@ app.listen(8108, function () {
 // connection configurations
 var dbConn = mysql.createConnection({
     host: 'localhost',
-    user: 'root',
-    password: '',
+    user: 'eirini',
+    password: 'e1r1n1',
     database: 'theaterdb'
 });
-  
+
 // connect to database
-dbConn.connect(); 
- 
+dbConn.connect();
+
 // default route
 app.get('/', function (req, res) {
     res.send('Hello from my api.');
@@ -91,6 +91,7 @@ app.get('/uses',(req, res) => {
 
 //add new use
 app.post('/uses', (req, res) => {
+    console.log("insert use", req);
     let data ={name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
     let sql = "INSERT INTO uses SET ?";
     let query = dbConn.query(sql, data,(err, results) => {
