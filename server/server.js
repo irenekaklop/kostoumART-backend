@@ -24,7 +24,7 @@ app.listen(8108, function () {
 var dbConn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: 'culture123!',
     database: 'theaterdb'
 });
   
@@ -73,7 +73,7 @@ app.post('/costumes',(req, res) => {
 app.delete('/costumes', function (req, res) {
    console.log(req);
    let sql = 'DELETE FROM costumes WHERE costume_name = ?';
-   let query = dbConn.query(sql, [req.query.name], function (error, results, fields) {
+   let query = dbConn.query(sql, [req.body.name], function (error, results, fields) {
 	  if (error) throw error;
 	  res.send('Record has been deleted!');
 	});
@@ -110,9 +110,9 @@ app.get('/uses/:id', (req, res) => {
 
 //delete use
 app.delete('/uses', function (req, res) {
-  console.log(req.body);
-  let sql = 'DELETE FROM uses WHERE id = ?';
-  dbConn.query(sql , [req.body.id], function (error, results, fields) {
+  console.log(req.query);
+  let sql = 'DELETE FROM uses WHERE name = ?';
+  dbConn.query(sql , [req.query.name], function (error, results, fields) {
    if (error) throw error;
    res.end('Record has been deleted!');
  });
@@ -129,6 +129,15 @@ app.get('/tps',(req, res) => {
     });
 });
 
+//show single tp
+app.get('/tps/:id', (req, res) => {
+  let sql = "SELECT * FROM theatrical_plays WHERE theatrical_play_id="+req.params.id;
+  let query = dbConn.query(sql, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  });
+});
+
 //add new theatrical play
 app.post('/tps', (req, res) => {
     let data ={title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater};
@@ -139,7 +148,7 @@ app.post('/tps', (req, res) => {
     });
 });
 
-//delete use
+//delete theatrical play
 app.delete('/tps', function (req, res) {
   console.log(req.body);
   let sql = 'DELETE FROM theatrical_plays WHERE id = ?';
