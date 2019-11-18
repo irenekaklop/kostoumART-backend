@@ -24,7 +24,7 @@ app.listen(8108, function () {
 var dbConn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'culture123!',
+    password: '',
     database: 'theaterdb'
 });
   
@@ -110,9 +110,9 @@ app.get('/uses/:id', (req, res) => {
 
 //delete use
 app.delete('/uses', function (req, res) {
-  console.log(req.query);
-  let sql = 'DELETE FROM uses WHERE name = ?';
-  dbConn.query(sql , [req.query.name], function (error, results, fields) {
+  console.log(req);
+  let sql = 'DELETE FROM uses WHERE useID = ?';
+  dbConn.query(sql , [req.query.id], function (error, results, fields) {
    if (error) throw error;
    res.end('Record has been deleted!');
  });
@@ -150,9 +150,9 @@ app.post('/tps', (req, res) => {
 
 //delete theatrical play
 app.delete('/tps', function (req, res) {
-  console.log(req.body);
-  let sql = 'DELETE FROM theatrical_plays WHERE id = ?';
-  dbConn.query(sql, [req.body.id], function (error, results, fields) {
+  console.log(req.query);
+  let sql = 'DELETE FROM theatrical_plays WHERE theatrical_play_id = ?';
+  dbConn.query(sql, [req.query.id], function (error, results, fields) {
    if (error) throw error;
    res.end('Record has been deleted!');
  });
