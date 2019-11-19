@@ -58,7 +58,8 @@ app.get('/costumes/:id', (req, res) => {
 
 //add new costume
 app.post('/costumes',(req, res) => {
-    let data ={costume_name: req.body.name, description: req.body.descr, use_name: req.body.u_value, technique: req.body.t_value, sex: req.body.s_value, material: req.body.m_value,
+    let data ={costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption, technique: req.body.selectedTechniqueOption, sex: req.body.selectedSexOption,
+        material: req.body.selectedMaterialOption,
         actors: req.body.actors, location: req.body.location, location_influence: req.body.location_influence,
         designer: req.body.designer, theatrical_play: req.body.tp_value, parts: req.body.parts  };
     console.log(data);
@@ -73,7 +74,7 @@ app.post('/costumes',(req, res) => {
 app.delete('/costumes', function (req, res) {
    console.log(req);
    let sql = 'DELETE FROM costumes WHERE costume_name = ?';
-   let query = dbConn.query(sql, [req.body.name], function (error, results, fields) {
+   let query = dbConn.query(sql, [req.query.name], function (error, results, fields) {
 	  if (error) throw error;
 	  res.send('Record has been deleted!');
 	});
