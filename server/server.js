@@ -40,7 +40,7 @@ app.get('/', function (req, res) {
 
 //show all costumes
 app.get('/costumes',(req, res) => {
-    let sql = "SELECT costumes.costume_name, costumes.description, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes INNER JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
+    let sql = "SELECT costumes.costume_name, costumes.description, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
     let query =  dbConn.query(sql, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -92,7 +92,7 @@ app.get('/uses',(req, res) => {
 
 //add new use
 app.post('/uses', (req, res) => {
-    let data ={name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
+    let data = {name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
     let sql = "INSERT INTO uses SET ?";
     let query = dbConn.query(sql, data,(err, results) => {
       if(err) throw err;
@@ -118,6 +118,17 @@ app.delete('/uses', function (req, res) {
    res.end('Record has been deleted!');
  });
 });
+
+//update use
+app.post('/edit_use', function (req, res){
+  let data = {useID: req.body.id, name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
+  console.log(data);
+  let sql = "UPDATE uses SET ? WHERE useID="+data.useID;
+  dbConn.query(sql, data, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  })
+})
 
 /*THEATRICAL PLAYS*/
 
