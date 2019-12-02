@@ -40,7 +40,7 @@ app.get('/', function (req, res) {
 
 //show all costumes
 app.get('/costumes',(req, res) => {
-    let sql = "SELECT costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
+    let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
     let query =  dbConn.query(sql, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -49,7 +49,7 @@ app.get('/costumes',(req, res) => {
    
 //show single costume
 app.get('/costumes/:id', (req, res) => {
-    let sql = "SELECT * FROM costumes WHERE costume_id="+req.params.id;
+    let sql = "SELECT * FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id = theatrical_plays.theatrical_play_id WHERE costume_id="+req.params.id;
     let query = dbConn.query(sql, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -79,6 +79,21 @@ app.delete('/costumes', function (req, res) {
 	  res.send('Record has been deleted!');
 	});
 });
+
+//update costume
+app.post('/edit_costume', function (req, res){
+  let data = {costume_id: req.body.costume_id, costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption, technique: req.body.selectedTechniqueOption,
+    sex: req.body.selectedSexOption,
+    material: req.body.selectedMaterialOption,
+    actors: req.body.actors, location: req.body.location, location_influence: req.body.location_influence,
+    designer: req.body.designer, theatrical_play: req.body.selectedTPOption, parts: req.body.parts};
+  console.log(data);
+  let sql = "UPDATE costumes SET ? WHERE costume_id="+data.costume_id;
+  dbConn.query(sql, data, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  })
+})
 
 /*USES*/
 //show all uses
@@ -169,5 +184,18 @@ app.delete('/tps', function (req, res) {
    res.end('Record has been deleted!');
  });
 });
+
+
+//update costume
+app.post('/edit_tp', function (req, res){
+  let data ={theatrical_play_id: req.body.theatrical_play_id, title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater};
+  console.log(data);
+  let sql = "UPDATE theatrical_plays SET ? WHERE theatrical_play_id="+data.theatrical_play_id;
+  dbConn.query(sql, data, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  })
+})
+
 
 module.exports = app;
