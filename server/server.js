@@ -88,7 +88,7 @@ app.post('/edit_costume', function (req, res){
     actors: req.body.actors, location: req.body.location, location_influence: req.body.location_influence,
     designer: req.body.designer, theatrical_play: req.body.selectedTPOption, parts: req.body.parts};
   console.log(data);
-  let sql = "UPDATE costumes SET ? WHERE costume_id="+data.costume_id;
+  let sql = "UPDATE costumes SET costume_name= '"+data.costume_name+"', description= '"+data.description+"', technique= '"+data.technique+"', sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', location_influence= '"+data.location_influence+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useID= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"'), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"') WHERE costume_id="+data.costume_id;
   dbConn.query(sql, data, (err, results) => {
     if(err) throw err;
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
