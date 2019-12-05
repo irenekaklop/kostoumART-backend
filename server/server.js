@@ -197,5 +197,15 @@ app.post('/edit_tp', function (req, res){
   })
 })
 
+//Users
+//show all users
+app.get('/users',(req, res) => {
+  let sql = "SELECT * FROM users";
+  let query =  dbConn.query(sql, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  });
+});
+
 
 module.exports = app;
