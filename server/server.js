@@ -207,5 +207,27 @@ app.get('/users',(req, res) => {
   });
 });
 
+app.post('/login', (req, res) => {
+  let userData = {email: req.body.email, password: req.body.password};
+  console.log(userData);
+  let sql = "SELECT * FROM users WHERE email='"+userData.email+"'AND password='"+userData.password+"'";
+  dbConn.query(sql,  userData, (error, results) => {
+    if (error) throw error;
+    
+    results = JSON.stringify(results);
+    results = JSON.parse(results);
+    results = results[0];
+
+    console.log("LOGIN", results);
+
+    if(!results){
+      console.log("error")
+      return res.status(401).send({
+        message:"User not verified."
+      });
+    }
+    return res.status(200).send(results);
+  });
+});
 
 module.exports = app;
