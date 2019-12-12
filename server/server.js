@@ -28,8 +28,12 @@ var dbConn = mysql.createConnection({
     password: 'e1r1n1',
 =======
     user: 'root',
+<<<<<<< HEAD
     password: 'culture123!',
 >>>>>>> c312a12b0b41d6dbc0bcbc3eaadaef41d2bd1546
+=======
+    password: '',
+>>>>>>> 77a22d5134d00d8ea8dc07a84200522351a578f4
     database: 'theaterdb'
 });
 
@@ -45,7 +49,7 @@ app.get('/', function (req, res) {
 
 //show all costumes
 app.get('/costumes',(req, res) => {
-    let sql = "SELECT costumes.costume_name, costumes.description, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes INNER JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
+    let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
     let query =  dbConn.query(sql, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -54,7 +58,7 @@ app.get('/costumes',(req, res) => {
    
 //show single costume
 app.get('/costumes/:id', (req, res) => {
-    let sql = "SELECT * FROM costumes WHERE costume_id="+req.params.id;
+    let sql = "SELECT * FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id = theatrical_plays.theatrical_play_id WHERE costume_id="+req.params.id;
     let query = dbConn.query(sql, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -63,9 +67,10 @@ app.get('/costumes/:id', (req, res) => {
 
 //add new costume
 app.post('/costumes',(req, res) => {
-    let data ={costume_name: req.body.name, description: req.body.descr, use_name: req.body.u_value, technique: req.body.t_value, sex: req.body.s_value, material: req.body.m_value,
+    let data ={costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption, technique: req.body.selectedTechniqueOption, sex: req.body.selectedSexOption,
+        material: req.body.selectedMaterialOption,
         actors: req.body.actors, location: req.body.location, location_influence: req.body.location_influence,
-        designer: req.body.designer, theatrical_play: req.body.tp_value, parts: req.body.parts  };
+        designer: req.body.designer, theatrical_play: req.body.selectedTPOption, parts: req.body.parts  };
     console.log(data);
     let sql = "INSERT INTO costumes SET costume_name= '"+data.costume_name+"', description= '"+data.description+"', technique= '"+data.technique+"', sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', location_influence= '"+data.location_influence+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useID= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"'), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"')";
     let query = dbConn.query(sql, data, (err, results) => {
@@ -78,11 +83,26 @@ app.post('/costumes',(req, res) => {
 app.delete('/costumes', function (req, res) {
    console.log(req);
    let sql = 'DELETE FROM costumes WHERE costume_name = ?';
-   let query = dbConn.query(sql, [req.body.name], function (error, results, fields) {
+   let query = dbConn.query(sql, [req.query.name], function (error, results, fields) {
 	  if (error) throw error;
 	  res.send('Record has been deleted!');
 	});
 });
+
+//update costume
+app.post('/edit_costume', function (req, res){
+  let data = {costume_id: req.body.costume_id, costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption, technique: req.body.selectedTechniqueOption,
+    sex: req.body.selectedSexOption,
+    material: req.body.selectedMaterialOption,
+    actors: req.body.actors, location: req.body.location, location_influence: req.body.location_influence,
+    designer: req.body.designer, theatrical_play: req.body.selectedTPOption, parts: req.body.parts};
+  console.log(data);
+  let sql = "UPDATE costumes SET costume_name= '"+data.costume_name+"', description= '"+data.description+"', technique= '"+data.technique+"', sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', location_influence= '"+data.location_influence+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useID= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"'), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"') WHERE costume_id="+data.costume_id;
+  dbConn.query(sql, data, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  })
+})
 
 /*USES*/
 //show all uses
@@ -96,8 +116,12 @@ app.get('/uses',(req, res) => {
 
 //add new use
 app.post('/uses', (req, res) => {
+<<<<<<< HEAD
     console.log("insert use", req);
     let data ={name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
+=======
+    let data = {name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
+>>>>>>> 77a22d5134d00d8ea8dc07a84200522351a578f4
     let sql = "INSERT INTO uses SET ?";
     let query = dbConn.query(sql, data,(err, results) => {
       if(err) throw err;
@@ -116,13 +140,24 @@ app.get('/uses/:id', (req, res) => {
 
 //delete use
 app.delete('/uses', function (req, res) {
-  console.log(req.query);
-  let sql = 'DELETE FROM uses WHERE name = ?';
-  dbConn.query(sql , [req.query.name], function (error, results, fields) {
+  console.log(req);
+  let sql = 'DELETE FROM uses WHERE useID = ?';
+  dbConn.query(sql , [req.query.id], function (error, results, fields) {
    if (error) throw error;
    res.end('Record has been deleted!');
  });
 });
+
+//update use
+app.post('/edit_use', function (req, res){
+  let data = {useID: req.body.id, name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
+  console.log(data);
+  let sql = "UPDATE uses SET ? WHERE useID="+data.useID;
+  dbConn.query(sql, data, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  })
+})
 
 /*THEATRICAL PLAYS*/
 
@@ -156,12 +191,61 @@ app.post('/tps', (req, res) => {
 
 //delete theatrical play
 app.delete('/tps', function (req, res) {
-  console.log(req.body);
-  let sql = 'DELETE FROM theatrical_plays WHERE id = ?';
-  dbConn.query(sql, [req.body.id], function (error, results, fields) {
+  console.log(req.query);
+  let sql = 'DELETE FROM theatrical_plays WHERE theatrical_play_id = ?';
+  dbConn.query(sql, [req.query.id], function (error, results, fields) {
    if (error) throw error;
    res.end('Record has been deleted!');
  });
 });
 
+<<<<<<< HEAD
 module.exports = app;
+=======
+
+//update costume
+app.post('/edit_tp', function (req, res){
+  let data ={theatrical_play_id: req.body.theatrical_play_id, title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater};
+  console.log(data);
+  let sql = "UPDATE theatrical_plays SET ? WHERE theatrical_play_id="+data.theatrical_play_id;
+  dbConn.query(sql, data, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  })
+})
+
+//Users
+//show all users
+app.get('/users',(req, res) => {
+  let sql = "SELECT * FROM users";
+  let query =  dbConn.query(sql, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  });
+});
+
+app.post('/login', (req, res) => {
+  let userData = {email: req.body.email, password: req.body.password};
+  console.log(userData);
+  let sql = "SELECT * FROM users WHERE email='"+userData.email+"'AND password='"+userData.password+"'";
+  dbConn.query(sql,  userData, (error, results) => {
+    if (error) throw error;
+    
+    results = JSON.stringify(results);
+    results = JSON.parse(results);
+    results = results[0];
+
+    console.log("LOGIN", results);
+
+    if(!results){
+      console.log("error")
+      return res.status(401).send({
+        message:"User not verified."
+      });
+    }
+    return res.status(200).send(results);
+  });
+});
+
+module.exports = app;
+>>>>>>> 77a22d5134d00d8ea8dc07a84200522351a578f4
