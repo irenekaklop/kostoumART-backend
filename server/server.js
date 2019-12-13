@@ -1,6 +1,8 @@
-var express = require('express'), http = require('http'), mysql = require('mysql');
+var express = require('express'), http = require('http');
 var app = express();
 var bodyParser = require('body-parser');
+
+require('./router/router.js')(app);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -21,29 +23,47 @@ app.listen(8108, function () {
 });
 
 // connection configurations
+var db = require('./config/db_config.js');
 var dbConn = mysql.createConnection({
-    host: 'localhost',
-<<<<<<< HEAD
-    user: 'eirini',
-    password: 'e1r1n1',
-=======
-    user: 'root',
-<<<<<<< HEAD
-    password: 'culture123!',
->>>>>>> c312a12b0b41d6dbc0bcbc3eaadaef41d2bd1546
-=======
-    password: '',
->>>>>>> 77a22d5134d00d8ea8dc07a84200522351a578f4
-    database: 'theaterdb'
+  host: 'localhost',
+  user: 'eirini',
+  password: '123',
+  database: 'theaterdb'
 });
 
 // connect to database
 dbConn.connect();
 
+const Role = db.role;
+  
+// force: true will drop the table if it already exists
+db.sequelize.sync({force: true}).then(() => {
+  console.log('Drop and Resync with { force: true }');
+  initial();
+});
+
 // default route
 app.get('/', function (req, res) {
     res.send('Hello from my api.');
 });
+
+
+function initial(){
+  Role.create({
+    id: 1,
+    name: "USER"
+  });
+  
+  Role.create({
+    id: 2,
+    name: "ADMIN"
+  });
+  
+  Role.create({
+    id: 3,
+    name: "PM"
+  });
+}
 
 /*COSTUMES*/
 
@@ -116,12 +136,8 @@ app.get('/uses',(req, res) => {
 
 //add new use
 app.post('/uses', (req, res) => {
-<<<<<<< HEAD
     console.log("insert use", req);
     let data ={name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
-=======
-    let data = {name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
->>>>>>> 77a22d5134d00d8ea8dc07a84200522351a578f4
     let sql = "INSERT INTO uses SET ?";
     let query = dbConn.query(sql, data,(err, results) => {
       if(err) throw err;
@@ -199,10 +215,6 @@ app.delete('/tps', function (req, res) {
  });
 });
 
-<<<<<<< HEAD
-module.exports = app;
-=======
-
 //update costume
 app.post('/edit_tp', function (req, res){
   let data ={theatrical_play_id: req.body.theatrical_play_id, title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater};
@@ -248,4 +260,4 @@ app.post('/login', (req, res) => {
 });
 
 module.exports = app;
->>>>>>> 77a22d5134d00d8ea8dc07a84200522351a578f4
+
