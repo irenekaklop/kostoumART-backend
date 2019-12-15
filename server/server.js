@@ -69,7 +69,7 @@ function initial(){
 
 //show all costumes
 app.get('/costumes',(req, res) => {
-    let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
+    let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
     let query =  dbConn.query(sql, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
