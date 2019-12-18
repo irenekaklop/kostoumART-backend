@@ -1,10 +1,11 @@
 var express = require('express'), http = require('http');
 var app = express();
 var bodyParser = require('body-parser');
-
-require('./router/router.js')(app);
+var cors = require('cors');
+var mysql = require('mysql')
 
 app.use(bodyParser.json());
+app.use(cors());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
@@ -22,48 +23,25 @@ app.listen(8108, function () {
     console.log('Node app is running on port 8108');
 });
 
+var Users = require('./routes/Users')
+
+app.use('/users', Users)
+
 // connection configurations
-var db = require('./config/db_config.js');
 var dbConn = mysql.createConnection({
   host: 'localhost',
-  user: 'eirini',
-  password: '123',
+  user: 'root',
+  password: 'root',
   database: 'theaterdb'
 });
 
 // connect to database
 dbConn.connect();
 
-const Role = db.role;
-  
-// force: true will drop the table if it already exists
-db.sequelize.sync({force: true}).then(() => {
-  console.log('Drop and Resync with { force: true }');
-  initial();
-});
-
 // default route
 app.get('/', function (req, res) {
     res.send('Hello from my api.');
 });
-
-
-function initial(){
-  Role.create({
-    id: 1,
-    name: "USER"
-  });
-  
-  Role.create({
-    id: 2,
-    name: "ADMIN"
-  });
-  
-  Role.create({
-    id: 3,
-    name: "PM"
-  });
-}
 
 /*COSTUMES*/
 
