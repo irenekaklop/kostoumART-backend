@@ -31,7 +31,7 @@ app.use('/users', Users)
 var dbConn = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'root',
+  password: '',
   database: 'theaterdb'
 });
 

@@ -54,20 +54,21 @@ users.post('/login', (req, res) => {
   .then(user => {
     if (user) {
       console.log("user values", user.dataValues.password, req.body.password);
-      console.log("user",bcrypt.compareSync(req.body.password, user.password))
       if (req.body.password=== user.dataValues.password) {
-       
         let token = jwt.sign(user.dataValues, process.env.SECRET_KEY, {
             expiresIn: 1440
         })
         res.send(token)
       }
-      } else {
-        res.status(400).json({ error: 'User does not exist' })
+      else{
+        res.status(400).send({ message: "Wrong password" })
+      }
+    } else {
+        res.status(401).send({ message: "User doesnt exists" })
       }
     }) 
     .catch(err => {
-      res.status(400).json({ error: err })
+      res.status(400).send(err);
     })
 })
 
