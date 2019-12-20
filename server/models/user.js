@@ -17,7 +17,10 @@ module.exports = db.sequelize.define(
     },
     password: {
       type: Sequelize.STRING
-    } 
+    },
+    role: {
+      type: Sequelize.STRING
+    }
   },
   {
     timestamps: false

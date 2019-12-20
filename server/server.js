@@ -47,7 +47,7 @@ app.get('/', function (req, res) {
 
 //show all costumes
 app.get('/costumes',(req, res) => {
-    let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
+    let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costume.useId, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
     let query =  dbConn.query(sql, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -65,12 +65,12 @@ app.get('/costumes/:id', (req, res) => {
 
 //add new costume
 app.post('/costumes',(req, res) => {
-    let data ={costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption, technique: req.body.selectedTechniqueOption, sex: req.body.selectedSexOption,
+    let data ={costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption, useCategory: req.body.selectedUseCategoryOption, technique: req.body.selectedTechniqueOption, sex: req.body.selectedSexOption,
         material: req.body.selectedMaterialOption,
         actors: req.body.actors, location: req.body.location, location_influence: req.body.location_influence,
-        designer: req.body.designer, theatrical_play: req.body.selectedTPOption, parts: req.body.parts  };
+        designer: req.body.designer, theatrical_play: req.body.selectedTPOption, parts: req.body.parts, userId: req.body.user_id  };
     console.log(data);
-    let sql = "INSERT INTO costumes SET costume_name= '"+data.costume_name+"', description= '"+data.description+"', technique= '"+data.technique+"', sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', location_influence= '"+data.location_influence+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useID= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"'), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"')";
+    let sql = "INSERT INTO costumes SET costume_name= '"+data.costume_name+"', description= '"+data.description+"', technique= '"+data.technique+"', sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', location_influence= '"+data.location_influence+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useID= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"' AND use_category = '"+data.useCategory+"'), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"'), userId = '"+data.userId+"'";
     let query = dbConn.query(sql, data, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -115,7 +115,7 @@ app.get('/uses',(req, res) => {
 //add new use
 app.post('/uses', (req, res) => {
     console.log("insert use", req);
-    let data ={name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs};
+    let data ={name: req.body.name, use_category: req.body.category, description: req.body.description, customs: req.body.customs, useId: req.body.useId};
     let sql = "INSERT INTO uses SET ?";
     let query = dbConn.query(sql, data,(err, results) => {
       if(err) throw err;
@@ -175,7 +175,7 @@ app.get('/tps/:id', (req, res) => {
 
 //add new theatrical play
 app.post('/tps', (req, res) => {
-    let data ={title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater};
+    let data ={title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater, useId: req.body.useId};
     let sql = "INSERT INTO theatrical_plays SET ?";
     let query = dbConn.query(sql, data,(err, results) => {
       if(err) throw err;
@@ -193,7 +193,7 @@ app.delete('/tps', function (req, res) {
  });
 });
 
-//update costume
+//update theatrical play
 app.post('/edit_tp', function (req, res){
   let data ={theatrical_play_id: req.body.theatrical_play_id, title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater};
   console.log(data);
