@@ -46,10 +46,12 @@ app.get('/', function (req, res) {
 /*COSTUMES*/
 
 //show all costumes
-app.get('/costumes',(req, res) => {
-    let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costume.useId, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id";
-    let query =  dbConn.query(sql, (err, results) => {
-      if(err) throw err;
+app.get('/costumes', (req, res) => {
+  let AuthUser = req.query.user;
+  console.log(AuthUser);
+  let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, costumes.userId as costumeCreator, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM theaterdb.costumes JOIN (SELECT user_id FROM theaterdb.users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID;";
+  let query =  dbConn.query(sql, (err, results) => {
+    if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
     });
   });
@@ -203,39 +205,6 @@ app.post('/edit_tp', function (req, res){
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
   })
 })
-
-//Users
-//show all users
-app.get('/users',(req, res) => {
-  let sql = "SELECT * FROM users";
-  let query =  dbConn.query(sql, (err, results) => {
-    if(err) throw err;
-    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-  });
-});
-
-app.post('/login', (req, res) => {
-  let userData = {email: req.body.email, password: req.body.password};
-  console.log(userData);
-  let sql = "SELECT * FROM users WHERE email='"+userData.email+"'AND password='"+userData.password+"'";
-  dbConn.query(sql,  userData, (error, results) => {
-    if (error) throw error;
-    
-    results = JSON.stringify(results);
-    results = JSON.parse(results);
-    results = results[0];
-
-    console.log("LOGIN", results);
-
-    if(!results){
-      console.log("error")
-      return res.status(401).send({
-        message:"User not verified."
-      });
-    }
-    return res.status(200).send(results);
-  });
-});
 
 module.exports = app;
 
