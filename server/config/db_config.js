@@ -5,7 +5,7 @@ const db = {}
 const sequelize = new Sequelize('theaterdb', 'root', '', {
   host: 'localhost',
   dialect: 'mysql',
-  operatorsAliases: false,
+  operatorsAliases: 1,
   pool: {
     max: 5,
     min: 0,
