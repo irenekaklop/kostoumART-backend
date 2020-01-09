@@ -199,7 +199,8 @@ app.get('/tps/:id', (req, res) => {
 
 //add new theatrical play
 app.post('/tps', (req, res) => {
-    let data ={title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater, useId: req.body.useId};
+    let data ={title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater, userId: req.body.userId};
+    console.log(data);
     let sql = "INSERT INTO theatrical_plays SET ?";
     let query = dbConn.query(sql, data,(err, results) => {
       if(err) throw err;
@@ -219,7 +220,7 @@ app.delete('/tps', function (req, res) {
 
 //update theatrical play
 app.post('/edit_tp', function (req, res){
-  let data ={theatrical_play_id: req.body.theatrical_play_id, title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater};
+  let data ={theatrical_play_id: req.body.theatrical_play_id, title: req.body.title, date: req.body.date, actors: req.body.actors, director: req.body.director, theater: req.body.theater, userId: req.body.userId};
   console.log(data);
   let sql = "UPDATE theatrical_plays SET ? WHERE theatrical_play_id="+data.theatrical_play_id;
   dbConn.query(sql, data, (err, results) => {
