@@ -272,6 +272,41 @@ app.get('/accessories/:id', (req, res) => {
   });
 });
 
+//update costume
+app.post('/editAccessory', function (req, res){
+  let sql;
+  let ready = false;
+  let data = {
+    accessory_id: req.body.accessory_id, 
+    costumeId: null,
+    theatricalPlayId: null,
+    useId: null,
+    name: req.body.name, description: req.body.description, 
+    technique: req.body.selectedTechniqueOption.value, 
+    material: req.body.selectedMaterialOption.value, 
+    date: req.body.selectedDateOption.value,
+    actors: req.body.actors, location: req.body.location,
+    designer: req.body.designer,  parts: req.body.parts};
+  if(req.body.selectedCostumeOption){
+    sql = "SELECT costume_id FROM costumes WHERE costume_name='"+req.body.selectedCostumeOption.value+"'";
+    dbConn.query(sql, (err, results) => {
+      if(err) throw err;
+      JSON.stringify(results);
+      data.costumeId=parseInt(results[0].costume_id);
+      
+    });
+  }
+  if(req.body.selectedUseOption){
+    sql = "SELECT useID FROM uses WHERE name='"+req.body.selectedUseOption.value+"'";
+  }
+  console.log(data);
+      sql = "UPDATE accessories SET ? WHERE accessory_id ="+data.accessory_id;
+      dbConn.query(sql, data, (err, results) => {
+        if(err) throw err;
+        res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+      })
+})
+
   
    
 
