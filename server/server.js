@@ -32,7 +32,7 @@ app.use('/users', Users)
 var dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: '',
+  password: 'root',
   database: 'theaterdb'
 }
 
@@ -97,7 +97,8 @@ app.post('/costumes',(req, res) => {
       sexs=sexs+','
     }
   }  
-  let data ={costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption.value, useCategory: req.body.selectedUseCategoryOption.value, 
+  let data ={costume_name: req.body.name, description: req.body.descr, 
+    use_name: req.body.selectedUseOption.value, useCategory: req.body.selectedUseOption.category, 
     technique: req.body.selectedTechniqueOption.value, sex: sexs,
     material: req.body.selectedMaterialOption.value,
     date:  req.body.selectedDateOption.value,
@@ -265,7 +266,7 @@ app.get('/accessories', (req, res) => {
   
 //show single accessory
 app.get('/accessories/:id', (req, res) => {
-  let sql = "SELECT accessories.accessory_id, accessories.name, accessories.description, accessories.useId, accessories.sex, uses.name as use_name, accessories.material, accessories.technique, accessories.date, accessories.location, accessories.designer, accessories.theatricalPlayId, theatrical_plays.title as tp_title, accessories.parts, accessories.actors FROM accessories LEFT JOIN uses ON accessories.useId = uses.useID LEFT JOIN theatrical_plays ON accessories.theatricalPlayId=theatrical_plays.theatrical_play_id WHERE accessory_id="+req.params.id;
+  let sql = "SELECT accessories.accessory_id, accessories.name, accessories.description, accessories.useId, accessories.sex, uses.name as use_name, accessories.material, accessories.technique, accessories.date, accessories.location, accessories.designer, accessories.theatricalPlayId, theatrical_plays.title as tp_title, accessories.parts, accessories.actors,  costumes.costume_name FROM accessories LEFT JOIN costumes ON accessories.costumeId = costumes.costume_id LEFT JOIN uses ON accessories.useId = uses.useID LEFT JOIN theatrical_plays ON accessories.theatricalPlayId=theatrical_plays.theatrical_play_id WHERE accessory_id="+req.params.id;
   let query = dbConn.query(sql, (err, results) => {
     if(err) throw err;
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -275,40 +276,66 @@ app.get('/accessories/:id', (req, res) => {
 //update costume
 app.post('/editAccessory', function (req, res){
   let sql;
-  let ready = false;
-  let data = {
-    accessory_id: req.body.accessory_id, 
-    costumeId: null,
-    theatricalPlayId: null,
-    useId: null,
-    name: req.body.name, description: req.body.description, 
-    technique: req.body.selectedTechniqueOption.value, 
-    material: req.body.selectedMaterialOption.value, 
-    date: req.body.selectedDateOption.value,
-    actors: req.body.actors, location: req.body.location,
-    designer: req.body.designer,  parts: req.body.parts};
-  if(req.body.selectedCostumeOption){
-    sql = "SELECT costume_id FROM costumes WHERE costume_name='"+req.body.selectedCostumeOption.value+"'";
-    dbConn.query(sql, (err, results) => {
-      if(err) throw err;
-      JSON.stringify(results);
-      data.costumeId=parseInt(results[0].costume_id);
-      
-    });
-  }
-  if(req.body.selectedUseOption){
-    sql = "SELECT useID FROM uses WHERE name='"+req.body.selectedUseOption.value+"'";
-  }
+  let sexs='';
+  for(var i=0; i < req.body.selectedSexOption.length; i++){
+    sexs = sexs+req.body.selectedSexOption[i].value;
+    if(i != req.body.selectedSexOption.length-1){
+      sexs=sexs+','
+    }
+  }  
+  let data ={
+    accessory_id: req.body.accessory_id,
+    accessory_name: req.body.name, description: req.body.description, 
+    use_name: req.body.selectedUseOption.value, useCategory: req.body.selectedUseOption.category, 
+    technique: req.body.selectedTechniqueOption.value, sex: sexs,
+    material: req.body.selectedMaterialOption.value,
+    date:  req.body.selectedDateOption.value,
+    actors: (req.body.actors? "" : req.body.actors), location: req.body.location,
+    costume_name: (req.body.selectedCostumeOption? null : req.body.selectedCostumeOption.value),
+    designer: (req.body.designer? "" : req.body.designer), 
+    theatrical_play: (req.body.selectedTPOption? null : selectedTPOption.value), parts: req.body.parts, userId: req.body.user_id  };
   console.log(data);
-      sql = "UPDATE accessories SET ? WHERE accessory_id ="+data.accessory_id;
+      sql = "UPDATE accessories SET name= '"+data.accessory_name+"', description= '"+data.description+"', date="+data.date+" , technique= '"+data.technique+"', sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useId= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"'), costumeId = (SELECT costume_id FROM costumes WHERE costume_name = '"+data.costume_name+"'), theatricalPlayId = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"') WHERE accessory_id="+data.accessory_id;
       dbConn.query(sql, data, (err, results) => {
         if(err) throw err;
         res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
       })
 })
 
-  
-   
+app.post('/accessory', (req, res) => {
+  let sexs='';
+  for(var i=0; i < req.body.selectedSexOption.length; i++){
+    sexs = sexs+req.body.selectedSexOption[i].value;
+    if(i != req.body.selectedSexOption.length-1){
+      sexs=sexs+','
+    }
+  }  
+  let data ={
+    accessory_name: req.body.name, description: req.body.description, 
+    use_name: req.body.selectedUseOption.value, useCategory: req.body.selectedUseOption.category, 
+    technique: req.body.selectedTechniqueOption.value, sex: sexs,
+    material: req.body.selectedMaterialOption.value,
+    date:  req.body.selectedDateOption.value,
+    actors: (req.body.actors? "" : req.body.actors), location: req.body.location,
+    costume_name: (req.body.selectedCostumeOption? null : req.body.selectedCostumeOption.value),
+    designer: (req.body.designer? "" : req.body.designer), 
+    theatrical_play: (req.body.selectedTPOption? null : selectedTPOption.value), parts: req.body.parts, userId: req.body.user_id  };
+  console.log("insert accessory", data);
+  let sql = "INSERT INTO accessories SET name= '"+data.accessory_name+"', description= '"+data.description+"', technique= '"+data.technique+"', date=  "+data.date+",sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useId= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"' AND use_category = '"+data.useCategory+"'), costumeId = (SELECT costume_id FROM costumes WHERE costume_name = '"+data.costume_name+"'), theatricalPlayId = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"'), userId = '"+data.userId+"'";
+  dbConn.query(sql, data, (err, results) => {
+    if(err) throw err;
+    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  })
+});
+
+app.delete('/accessory', function (req, res) {
+  console.log(req.query);
+  let sql = 'DELETE FROM accessories WHERE accessory_id = ?';
+  dbConn.query(sql, [req.query.id], function (error, results, fields) {
+   if (error) throw error;
+   res.end('Record has been deleted!');
+ });
+});
 
 module.exports = app;
 
