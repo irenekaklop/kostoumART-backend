@@ -88,6 +88,66 @@ app.get('/costumes/:id', (req, res) => {
     });
   });
 
+//show costumes with filters
+app.get('/filteredCostumes', (req, res) => {
+  let AuthUser = req.query.user;
+  console.log("AuthUser", AuthUser);
+  let filters = req.query.filters;
+  console.log("filters", filters)
+  let technique=null;
+  let sex=null;
+  filters.forEach(filter => {
+    if(filter.name==="technique"){
+      console.log(filter.name);
+      if(filter.value){
+        technique=[];
+        filter.value.forEach(element => {
+          technique.push(element.name);
+        });
+      }
+    }
+    else if(filter.name==="sex"){
+      if(filter.value){
+        sex=[];
+        filter.value.forEach(element => {
+          sex.push(element.name);
+        })
+      }
+    }
+  });
+  console.log("f", technique, sex)
+  let sql = "SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, costumes.userId as costumeCreator, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= 1) S2 ON costumes.userId = S2.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID "
+  if(technique || sex){
+    sql = sql + "WHERE ("
+  }
+  if(technique){
+    for(var i=0; i<technique.length; i++){
+      if(i>0){
+        sql= sql + " || "
+      }
+      sql = sql +"technique='"+ technique[i] + "'";
+    }
+    sql = sql + ')'
+  }
+  if(technique&&sex){
+    sql = sql + ' && (';
+  }
+  if(sex){
+    for(var i=0; i<sex.length; i++){
+      if(i>0){
+        sql= sql + " || "
+      }
+      sql = sql +"sex LIKE'%"+ sex[i] + "%'";
+    }
+    sql=sql+')'
+  }
+  dbConn.query(sql, (err, results) => {
+    if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+  })
+  console.log("FILTERS", sql);
+})
+
 //add new costume
 app.post('/costumes',(req, res) => {
   let sexs='';
