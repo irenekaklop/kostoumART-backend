@@ -162,9 +162,9 @@ app.post('/costumes',(req, res) => {
     actors: req.body.actors, location: req.body.location,
     designer: req.body.designer, theatrical_play: (req.body.selectedTPOption ? req.body.selectedTPOption.value : null ), parts: req.body.parts, userId: req.body.user_id  };
   console.log("insert costume", data);
-  let sql = "INSERT INTO costumes SET costume_name= '"+data.costume_name+"', description= '"+data.description+"', technique= '"+data.technique+"', date=  "+data.date+",sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', location_influence= '"+data.location_influence+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useID= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"' AND use_category = '"+data.useCategory+"'), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"'), userId = '"+data.userId+"'";
+  let sql = "INSERT INTO costumes SET costume_name=?, description= ?, technique= ?, date=  ?,sex= ?, material= ?, actors= ?, location= ?, designer= ?, parts= '?, useID= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?), userId = ?";
     console.log(sql)
-    let query = dbConn.query(sql, data, (err, results) => {
+    let query = dbConn.query(sql, [data.costume_name, data.description, data.technique, data.date, data.sex, data.material, data.actors, data.location, data.designer, data.parts, data.use_name, data.useCategory, data.theatrical_play, data.userId ], (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
     });
@@ -189,16 +189,17 @@ app.post('/edit_costume', function (req, res){
       sexs=sexs+','
     }
   }  
-  let data = {costume_id: req.body.costume_id, costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption.value, 
+  let data = {costume_id: req.body.costume_id, costume_name: req.body.name, description: req.body.descr, use_name: req.body.selectedUseOption.value, useCategory: req.body.selectedUseOption.category, 
     technique: req.body.selectedTechniqueOption.value, material: req.body.selectedMaterialOption.value, theatrical_play: (req.body.selectedTPOption ? req.body.selectedTPOption.value : null ),
     sex: sexs,
     date: req.body.selectedDateOption.value,
     actors: req.body.actors, location: req.body.location,
     designer: req.body.designer,  parts: req.body.parts};
   console.log("update costume", data);
-  let sql = "UPDATE costumes SET costume_name= '"+data.costume_name+"', description= '"+data.description+"', date="+data.date+" , technique= '"+data.technique+"', sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', location_influence= '"+data.location_influence+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useID= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"'), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"') WHERE costume_id="+data.costume_id;
+  let sql = "UPDATE costumes SET costume_name= ?, description= ?, date=? , technique= ?, sex= ?, material= ?, actors= ?, location= ?, designer= ?, useID= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?) WHERE costume_id=?";
   console.log(sql)
-  dbConn.query(sql, data, (err, results) => {
+  dbConn.query(sql,[data.costume_name, data.description, data.date, data.technique, data.sex, data.material, data.actors, data.location, data.designer, data.use_name, data.useCategory, data.theatrical_play, data.costume_id], 
+    (err, results) => {
     if(err) throw err;
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
   })
@@ -354,8 +355,8 @@ app.post('/editAccessory', function (req, res){
     theatrical_play: (req.body.selectedTPOption? selectedTPOption.value : null ), parts: (req.body.parts ? req.body.parts : ''), 
     userId: req.body.user_id  };
   console.log(data);
-      sql = "UPDATE accessories SET name= '"+data.accessory_name+"', description= '"+data.description+"', date="+data.date+" , technique= '"+data.technique+"', sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useId= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"'), costumeId = (SELECT costume_id FROM costumes WHERE costume_name = '"+data.costume_name+"'), theatricalPlayId = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"') WHERE accessory_id="+data.accessory_id;
-      dbConn.query(sql, data, (err, results) => {
+      sql = "UPDATE accessories SET name= ?, description= ?, date=? , technique= ?, sex= ?, material= ?, actors= ?, location= ?, designer= ? , parts= ?, useId= ( SELECT useID FROM uses WHERE name = ? AND use_category = ? ), costumeId = (SELECT costume_id FROM costumes WHERE costume_name = ?), theatricalPlayId = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?) WHERE accessory_id=?";
+      dbConn.query(sql, [data.accessory_name, data.description, data.date, data.technique, data.sex, data.material, data.actors, data.location, data.designer, data.parts, data.use_name, data.useCategory, data.costume_name, data.theatrical_play, data.accessory_id], (err, results) => {
         if(err) throw err;
         res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
       })
@@ -382,8 +383,8 @@ app.post('/accessory', (req, res) => {
     theatrical_play: (req.body.selectedTPOption? selectedTPOption.value : null ), parts: (req.body.parts ? req.body.parts : ''), 
     userId: req.body.user_id  };
   console.log("insert accessory", data);
-  let sql = "INSERT INTO accessories SET name= '"+data.accessory_name+"', description= '"+data.description+"', technique= '"+data.technique+"', date=  "+data.date+",sex= '"+data.sex+"', material= '"+data.material+"', actors= '"+data.actors+"', location= '"+data.location+"', designer= '"+data.designer+"', parts= '"+data.parts+"', useId= ( SELECT useID FROM uses WHERE name = '"+data.use_name+"' AND use_category = '"+data.useCategory+"'), costumeId = (SELECT costume_id FROM costumes WHERE costume_name = '"+data.costume_name+"'), theatricalPlayId = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '"+data.theatrical_play+"'), userId = '"+data.userId+"'";
-  dbConn.query(sql, data, (err, results) => {
+  let sql = "INSERT INTO accessories SET name= ?, description= ?, technique= ?, date=  ?,sex= ?, material= ?, actors= ?, location= ?, designer= ?, parts= ?, useId= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), costumeId = (SELECT costume_id FROM costumes WHERE costume_name = ?), theatricalPlayId = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?), userId = ?";
+  dbConn.query(sql, [data.accessory_name, data.description, data.date, data.technique, data.sex, data.material, data.actors, data.location, data.designer, data.parts, data.use_name, data.useCategory, data.costume_name, data.theatrical_play, data.accessory_id], (err, results) => {
     if(err) throw err;
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
   })
