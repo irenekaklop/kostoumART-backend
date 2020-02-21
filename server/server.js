@@ -346,7 +346,7 @@ app.post('/edit_tp', function (req, res){
 app.get('/accessories', (req, res) => {
   let AuthUser = req.query.user;
   console.log("AuthUser", AuthUser);
-  let sql = "SELECT accessory_id, accessories.name, accessories.description, accessories.date, accessories.sex, accessories.material, accessories.technique, accessories.location, accessories.designer, accessories.parts, accessories.actors, costumeId, accessories.useId, accessories.userId, users.username as CreatedBy, uses.name as use_name, costumes.costume_name, uses.use_category FROM accessories JOIN (SELECT user_id FROM theaterdb.users where role <= '"+AuthUser+"') S2 ON accessories.userId = S2.user_id left join theatrical_plays ON accessories.theatricalPlayId = theatrical_play_id left join uses ON accessories.useId = uses.useID left join costumes ON accessories.costumeId=costumes.costume_id left join users on accessories.userId=users.user_id;";
+  let sql = "SELECT accessory_id, accessories.name, accessories.description, accessories.date, accessories.sex, accessories.material, accessories.technique, accessories.location, accessories.designer, accessories.parts, theatrical_plays.title as tp_title, accessories.actors, costumeId, accessories.useId, accessories.userId, users.username as CreatedBy, uses.name as use_name, costumes.costume_name, uses.use_category FROM accessories JOIN (SELECT user_id FROM theaterdb.users where role <= '"+AuthUser+"') S2 ON accessories.userId = S2.user_id left join theatrical_plays ON accessories.theatricalPlayId = theatrical_play_id left join uses ON accessories.useId = uses.useID left join costumes ON accessories.costumeId=costumes.costume_id left join users on accessories.userId=users.user_id;";
   let query =  dbConn.query(sql, (err, results) => {
     if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -355,7 +355,7 @@ app.get('/accessories', (req, res) => {
   
 //show single accessory
 app.get('/accessories/:id', (req, res) => {
-  let sql = "SELECT accessories.accessory_id, accessories.name, accessories.description, accessories.useId, accessories.sex, uses.name as use_name, accessories.material, accessories.technique, accessories.date, accessories.location, accessories.designer, accessories.theatricalPlayId, theatrical_plays.title as tp_title, accessories.parts, accessories.actors,  costumes.costume_name FROM accessories LEFT JOIN costumes ON accessories.costumeId = costumes.costume_id LEFT JOIN uses ON accessories.useId = uses.useID LEFT JOIN theatrical_plays ON accessories.theatricalPlayId=theatrical_plays.theatrical_play_id WHERE accessory_id="+req.params.id;
+  let sql = "SELECT accessories.accessory_id, accessories.name, accessories.description, accessories.useId, accessories.sex, uses.name as use_name, accessories.material, accessories.technique, accessories.date, accessories.location, theatrical_plays.title as tp_title, accessories.designer, accessories.theatricalPlayId, theatrical_plays.title as tp_title, accessories.parts, accessories.actors,  costumes.costume_name FROM accessories LEFT JOIN costumes ON accessories.costumeId = costumes.costume_id LEFT JOIN uses ON accessories.useId = uses.useID LEFT JOIN theatrical_plays ON accessories.theatricalPlayId=theatrical_plays.theatrical_play_id WHERE accessory_id="+req.params.id;
   let query = dbConn.query(sql, (err, results) => {
     if(err) throw err;
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
@@ -383,7 +383,7 @@ app.post('/editAccessory', function (req, res){
     location: (req.body.location ? req.body.location : ''),
     costume_name: (req.body.selectedCostumeOption? req.body.selectedCostumeOption.value : null),
     designer: (req.body.designer? req.body.designer : ""), 
-    theatrical_play: (req.body.selectedTPOption? selectedTPOption.value : null ), parts: (req.body.parts ? req.body.parts : ''), 
+    theatrical_play: (req.body.selectedTPOption? req.body.selectedTPOption.value : null ), parts: (req.body.parts ? req.body.parts : ''), 
     userId: req.body.user_id  };
   console.log(data);
       sql = "UPDATE accessories SET name= ?, description= ?, date=? , technique= ?, sex= ?, material= ?, actors= ?, location= ?, designer= ? , parts= ?, useId= ( SELECT useID FROM uses WHERE name = ? AND use_category = ? ), costumeId = (SELECT costume_id FROM costumes WHERE costume_name = ?), theatricalPlayId = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?) WHERE accessory_id=?";
