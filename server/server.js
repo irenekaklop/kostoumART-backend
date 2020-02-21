@@ -66,6 +66,35 @@ app.get('/', function (req, res) {
     res.send('Hello from my api.');
 });
 
+app.get('/dependency', (req, res) => {
+  let index = req.query.index;
+  let column = req.query.column;
+  let sql;
+  console.log(req.query);
+  if(column==="use"){
+    sql= "SELECT (SELECT EXISTS (select * FROM costumes where useID=?)) OR (SELECT EXISTS (select * FROM accessories where useID=?)) as result"
+    let query = dbConn.query(sql, [index, index],(err, results) => {
+      if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+    });
+  }
+  else if (column==="theatrical_play"){
+    sql= "SELECT (SELECT EXISTS (select * FROM costumes where theatrical_play_id=?)) OR (SELECT EXISTS (select * FROM accessories where theatricalPlayId=?)) as result;"
+    let query = dbConn.query(sql, [index, index],(err, results) => {
+      if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+    });
+  }
+  else if (column==='costume'){
+    sql = "SELECT EXISTS (select * FROM accessories where costumeId=?) as result;"
+    let query = dbConn.query(sql, [index],(err, results) => {
+      if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+    });
+  }
+ 
+});
+
 /*COSTUMES*/
 
 //show all costumes
@@ -172,9 +201,9 @@ app.post('/costumes',(req, res) => {
 
 //delete costume
 app.delete('/costumes', function (req, res) {
-   console.log(req);
-   let sql = 'DELETE FROM costumes WHERE costume_name = ?';
-   let query = dbConn.query(sql, [req.query.name], function (error, results, fields) {
+   console.log(req.query);
+   let sql = 'DELETE FROM costumes WHERE costume_id = ?';
+   let query = dbConn.query(sql, [req.query.costume_id], function (error, results, fields) {
 	  if (error) throw error;
 	  res.send('Record has been deleted!');
 	});
@@ -204,6 +233,8 @@ app.post('/edit_costume', function (req, res){
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
   })
 })
+
+
 
 /*USES*/
 //show all uses
