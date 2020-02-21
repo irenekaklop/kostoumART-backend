@@ -411,7 +411,7 @@ app.post('/accessory', (req, res) => {
     location: (req.body.location ? req.body.location : ''),
     costume_name: (req.body.selectedCostumeOption? req.body.selectedCostumeOption.value : null),
     designer: (req.body.designer? req.body.designer : ""), 
-    theatrical_play: (req.body.selectedTPOption? selectedTPOption.value : null ), parts: (req.body.parts ? req.body.parts : ''), 
+    theatrical_play: (req.body.selectedTPOption? req.body.selectedTPOption.value : null ), parts: (req.body.parts ? req.body.parts : ''), 
     userId: req.body.user_id  };
   console.log("insert accessory", data);
   let sql = "INSERT INTO accessories SET name= ?, description= ?, technique= ?, date=  ?,sex= ?, material= ?, actors= ?, location= ?, designer= ?, parts= ?, useId= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), costumeId = (SELECT costume_id FROM costumes WHERE costume_name = ?), theatricalPlayId = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?), userId = ?";
