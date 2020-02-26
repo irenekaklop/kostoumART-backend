@@ -191,7 +191,7 @@ app.post('/costumes',(req, res) => {
     actors: req.body.actors, location: req.body.location,
     designer: req.body.designer, theatrical_play: (req.body.selectedTPOption ? req.body.selectedTPOption.value : null ), parts: req.body.parts, userId: req.body.user_id  };
   console.log("insert costume", data);
-  let sql = "INSERT INTO costumes SET costume_name=?, description= ?, technique= ?, date=  ?,sex= ?, material= ?, actors= ?, location= ?, designer= ?, parts= '?, useID= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?), userId = ?";
+  let sql = "INSERT INTO costumes SET costume_name=?, description= ?, technique= ?, date=  ?,sex= ?, material= ?, actors= ?, location= ?, designer= ?, parts= ?, useID= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?), userId = ?";
     console.log(sql)
     let query = dbConn.query(sql, [data.costume_name, data.description, data.technique, data.date, data.sex, data.material, data.actors, data.location, data.designer, data.parts, data.use_name, data.useCategory, data.theatrical_play, data.userId ], (err, results) => {
       if(err) throw err;
