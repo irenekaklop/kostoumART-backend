@@ -1,7 +1,7 @@
 module.exports = {
     HOST: "localhost",
-    USER: "root",
-    PASSWORD: "root",
+    USER: "eirini",
+    PASSWORD: "e1r1n1",
     DB: 'theaterdb',
     dialect: "mysql",
     pool: {
@@ -10,4 +10,4 @@ module.exports = {
       acquire: 30000,
       idle: 10000
     }
-  };
+};

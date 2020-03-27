@@ -1,6 +1,6 @@
 module.exports = {
     host: 'localhost',
-    user: 'root',
-    password: 'root',
+    user: 'eirini',
+    password: 'e1r1r1',
     database: 'theaterdb'
 };

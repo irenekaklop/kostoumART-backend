@@ -5,6 +5,8 @@ const sql = require("./models/db");
 
 const app = express();
 
+app.use(cors());
+
 // Express middleware that allows POSTing data
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
