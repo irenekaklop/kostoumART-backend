@@ -113,7 +113,7 @@ exports.update = (req, res) => {
   }
  
   const costume = new Costume({
-    name: req.body.data.name.value,
+    costume_name: req.body.data.name.value,
     description: req.body.data.description.value,
     useName: req.body.data.selectedUseOption.value,
     useCategory: req.body.data.selectedUseOption.category, 
