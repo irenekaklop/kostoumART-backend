@@ -43,6 +43,8 @@ exports.create = (req, res) => {
     userId: req.body.user
   });
 
+  console.log("Costume ", costume);
+  
   // Save Item in the database
   Costume.create(costume, (err, data) => {
     if (err)
