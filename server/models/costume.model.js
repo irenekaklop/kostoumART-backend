@@ -2,7 +2,7 @@ const sql = require("./db.js");
 
 // constructor
 const Costume = function(costume) {
-    this.costume_name = costume.name;
+    this.costume_name = costume.costume_name;
     this.description = costume.description;
     this.date = costume.date;
     this.material = costume.material;
