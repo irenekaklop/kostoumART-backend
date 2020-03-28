@@ -22,7 +22,7 @@ users.post('/login', (req, res) => {
       console.log("user values", user.dataValues);
       if (req.body.password=== user.dataValues.password) {
         var LoginData = user.dataValues.email + '  ' + datetime + '\n'
-        fs.appendFile('./logs/logFile', LoginData, function (err) {
+        fs.appendFile('./server/logs/logFile', LoginData, function (err) {
         if (err) throw err;
           console.log('Saved!');
         });
