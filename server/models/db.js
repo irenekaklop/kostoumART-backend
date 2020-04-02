@@ -2,16 +2,18 @@ const mysql = require("mysql");
 const dbConfig = require("../config/db.config.js");
 
 // Create a connection to the database
-const connection = mysql.createConnection({
+const connectionConfig = {
   host: dbConfig.host,
   user: dbConfig.user,
   password: dbConfig.password,
   database: dbConfig.database
-});
+};
+
+const connection; 
 
 function handleConnection() {
-  mysql.createConnection(connection); // Recreate the connection, since
-                                      // the old one cannot be reused.
+  connection = mysql.createConnection(connectionConfig); // Recreate the connection, since
+                                                        // the old one cannot be reused.
 
   connection.connect(function(err) {           // The server is either down
     if(err) {                                 // or restarting (takes a while sometimes).
