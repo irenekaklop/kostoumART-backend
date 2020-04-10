@@ -4,6 +4,7 @@ const sql = require("./db.js");
 const Accessory = function(accessory) {
     this.name = accessory.name;
     this.description = accessory.description;
+    this.descriptionHtml = accessory.descriptionHtml,
     this.date = accessory.date;
     this.technique = accessory.technique;
     this.designer = accessory.designer;
@@ -20,6 +21,7 @@ const Accessory = function(accessory) {
 Accessory.create = (newAccessory, result) => {
     sql.query(
       `INSERT INTO accessories SET name= '${newAccessory.name}', description= '${newAccessory.description}', 
+      descriptionHtml='${newAccessory.descriptionHtml}',
       technique= '${newAccessory.technique}', date=  '${newAccessory.date}', sex= '${newAccessory.sex}', 
       actors= '${newAccessory.actors}', location= '${newAccessory.location}', designer= '${newAccessory.designer}',
       useId= ( SELECT useID FROM uses WHERE name = '${newAccessory.useName}' AND use_category = '${newAccessory.useCategory}'), 
@@ -38,8 +40,8 @@ Accessory.create = (newAccessory, result) => {
 };
 
 Accessory.findById = (accessoryId, result) => {
-    sql.query(`SELECT accessories.accessory_id, accessories.name, accessories.description, accessories.useId, 
-    accessories.sex, uses.name as use_name, uses.use_category,
+    sql.query(`SELECT accessories.accessory_id, accessories.name, accessories.description, accessories.descriptionHtml,
+    accessories.useId, accessories.sex, uses.name as use_name, uses.use_category,
     accessories.material, accessories.technique, accessories.date, accessories.location, theatrical_plays.title as tp_title, accessories.designer, accessories.theatricalPlayId, theatrical_plays.title as tp_title, accessories.parts, accessories.actors,  costumes.costume_name FROM accessories LEFT JOIN costumes ON accessories.costumeId = costumes.costume_id LEFT JOIN uses ON accessories.useId = uses.useID LEFT JOIN theatrical_plays ON accessories.theatricalPlayId=theatrical_plays.theatrical_play_id WHERE accessory_id= ${accessoryId}`, (err, res) => {
       if (err) {
         console.log("error: ", err);
@@ -59,7 +61,7 @@ Accessory.findById = (accessoryId, result) => {
 };
   
 Accessory.getAll = (AuthUser, result) => {
-    sql.query("SELECT accessory_id, accessories.name, accessories.description, accessories.date, accessories.sex, accessories.material, accessories.technique, accessories.location, accessories.designer, accessories.parts, theatrical_plays.title as tp_title, accessories.actors, costumeId, accessories.useId, accessories.userId, users.username as CreatedBy, uses.name as use_name, costumes.costume_name, uses.use_category FROM accessories JOIN (SELECT user_id FROM theaterdb.users where role <= '"+AuthUser+"') S2 ON accessories.userId = S2.user_id left join theatrical_plays ON accessories.theatricalPlayId = theatrical_play_id left join uses ON accessories.useId = uses.useID left join costumes ON accessories.costumeId=costumes.costume_id left join users on accessories.userId=users.user_id;", (err, res) => {
+    sql.query("SELECT accessory_id, accessories.name, accessories.description, accessories.descriptionHtml, accessories.date, accessories.sex, accessories.material, accessories.technique, accessories.location, accessories.designer, accessories.parts, theatrical_plays.title as tp_title, accessories.actors, costumeId, accessories.useId, accessories.userId, users.username as CreatedBy, uses.name as use_name, costumes.costume_name, uses.use_category FROM accessories JOIN (SELECT user_id FROM theaterdb.users where role <= '"+AuthUser+"') S2 ON accessories.userId = S2.user_id left join theatrical_plays ON accessories.theatricalPlayId = theatrical_play_id left join uses ON accessories.useId = uses.useID left join costumes ON accessories.costumeId=costumes.costume_id left join users on accessories.userId=users.user_id;", (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -75,6 +77,7 @@ Accessory.updateById = (id, accessory, result) => {
   console.log(accessory);
     sql.query(
       `UPDATE accessories SET name= '${accessory.name}', description= '${accessory.description}', 
+      descriptionHtml='${accessory.descriptionHtml}',
       date='${accessory.date}' , technique= '${accessory.technique}', sex= '${accessory.sex}', 
       material= '${accessory.material}', actors= '${accessory.actors}', location= '${accessory.location}', 
       designer= '${accessory.designer}', parts= '${accessory.parts}', 

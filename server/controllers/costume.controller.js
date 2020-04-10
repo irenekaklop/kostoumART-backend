@@ -28,6 +28,7 @@ exports.create = (req, res) => {
   const costume = new Costume({
     costume_name: req.body.data.name.value,
     description: req.body.data.description.value,
+    descriptionHtml: req.body.data.descriptionHtml.value,
     useName: req.body.data.selectedUseOption.value,
     useCategory: req.body.data.selectedUseOption.category, 
     technique: req.body.data.selectedTechniqueOption.value,
@@ -96,6 +97,8 @@ exports.update = (req, res) => {
     });
   }
 
+  console.log("req", req)
+
   //Prepare arrays
   let _sexsStr = '';
   let _materialsStr = '';
@@ -115,6 +118,7 @@ exports.update = (req, res) => {
   const costume = new Costume({
     costume_name: req.body.data.name.value,
     description: req.body.data.description.value,
+    descriptionHtml: req.body.data.descriptionHtml.value,
     useName: req.body.data.selectedUseOption.value,
     useCategory: req.body.data.selectedUseOption.category, 
     technique: req.body.data.selectedTechniqueOption.value,
@@ -130,21 +134,20 @@ exports.update = (req, res) => {
     userId: req.body.user
   });
 
-  console.log(req.body, costume);
-    Costume.updateById( req.params.costumeId, costume, (err, data) => {
-        if (err) {
-            if (err.kind === "not_found") {
-                res.status(404).send({
-                message: `Not found Costume with id ${req.params.costumeId}.`
-            });
-        } else {
-          res.status(500).send({
-            message: "Error updating Costume with id " + req.params.costumeId
-          });
-        }
-      } else res.send(data);
-    }
-  );
+
+  Costume.updateById( req.params.costumeId, costume, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+        message: `Not found Costume with id ${req.params.costumeId}.`
+        });
+      } else {
+        res.status(500).send({
+        message: "Error updating Costume with id " + req.params.costumeId
+        });
+      }
+    } else res.send(data);
+  });
 };
 
 // Delete a Costume with the specified costumeId in the request

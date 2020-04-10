@@ -21,6 +21,7 @@ exports.create = (req, res) => {
   const accessory = new Accessory({
     name: req.body.data.name.value,
     description: req.body.data.description.value,
+    descriptionHtml: req.body.data.descriptionHtml.value,
     useName: req.body.data.selectedUseOption.value,
     useCategory: req.body.data.selectedUseOption.category, 
     technique: req.body.data.selectedTechniqueOption.value,
@@ -97,6 +98,7 @@ exports.update = (req, res) => {
     const accessory = new Accessory({
         name: req.body.data.name.value,
         description: req.body.data.description.value,
+        descriptionHtml: req.body.data.descriptionHtml.value,
         useName: req.body.data.selectedUseOption.value,
         useCategory: req.body.data.selectedUseOption.category, 
         technique: req.body.data.selectedTechniqueOption.value,

@@ -4,6 +4,7 @@ const sql = require("./db.js");
 const Costume = function(costume) {
     this.costume_name = costume.costume_name;
     this.description = costume.description;
+    this.descriptionHtml = costume.descriptionHtml;
     this.date = costume.date;
     this.material = costume.material;
     this.technique = costume.technique;
@@ -23,6 +24,7 @@ Costume.create = (costume, result) => {
   console.log("costum insert", costume)
     sql.query(
       `INSERT INTO costumes SET costume_name= '${costume.costume_name}', description= '${costume.description}', 
+      descriptionHtml = '${costume.descriptionHtml}',
       technique= '${costume.technique}', date=  '${costume.date}', sex= '${costume.sex}', material= '${costume.material}', 
       actors= '${costume.actors}', location= '${costume.location}', designer= '${costume.designer}', 
       parts= '${costume.parts}',
@@ -41,7 +43,7 @@ Costume.create = (costume, result) => {
 };
   
 Costume.findById = (costumeId, result) => {
-    sql.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
+    sql.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -60,7 +62,7 @@ Costume.findById = (costumeId, result) => {
 };
   
 Costume.getAll = (AuthUser, result) => {
-    sql.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
+    sql.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -76,6 +78,7 @@ Costume.updateById = (id, costume, result) => {
   console.log(costume);
   sql.query(
     `UPDATE costumes SET costume_name= '${costume.costume_name}', description= '${costume.description}', 
+    descriptionHtml = '${costume.descriptionHtml}',
     date= '${costume.date}' , technique= '${costume.technique}', sex= '${costume.sex}', 
     material= '${costume.material}', actors= '${costume.actors}', location= '${costume.location}', 
     designer= '${costume.designer}', 
@@ -122,7 +125,7 @@ Costume.remove = (id, result) => {
 
 Costume.filter = (sex, technique, result) => {
   console.log(sex, technique)
-  let query = `SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.date, costumes.useID, costumes.sex, 
+  let query = `SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.date, costumes.useID, costumes.sex, 
   uses.name as use_name, costumes.userId as costumeCreator, costumes.material, costumes.technique, 
   costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, 
   theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes 
