@@ -21,8 +21,6 @@ require("./routes/routes.js")(app);
 var Users = require('./routes/users.routes');
 app.use('/users', Users);
 
-const db = require("./models");
-
 // set port, listen for requests
 app.listen(8108, () => {
     console.log("Server is running on port 8108.");
