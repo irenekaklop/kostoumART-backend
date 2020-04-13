@@ -18,8 +18,7 @@ app.get('/', function (req, res) {
 
 // include routes
 require("./routes/routes.js")(app);
-var Users = require('./routes/users.routes');
-app.use('/users', Users);
+require('./routes/users.routes')(app);
 
 // set port, listen for requests
 app.listen(8108, () => {
