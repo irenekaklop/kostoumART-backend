@@ -8,8 +8,8 @@ const app = express();
 app.use(cors());
 
 // Express middleware that allows POSTing data
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({limit: '50mb'}));
+app.use(bodyParser.json({limit: '50mb'}));
 
 // default route
 app.get('/', function (req, res) {
