@@ -12,6 +12,7 @@ exports.create = (req, res) => {
     const use = new Use({
         name: req.body.data.name.value, 
         use_category: req.body.data.useCategory.value, 
+        descriptionHtml: req.body.data.descriptionHtml.value,
         description: req.body.data.description.value, 
         customs: req.body.data.customs.value, 
         userId: req.body.userId
@@ -71,6 +72,7 @@ exports.update = (req, res) => {
         name: req.body.data.name.value, 
         use_category: req.body.data.useCategory.value, 
         description: req.body.data.description.value, 
+        descriptionHtml: req.body.data.descriptionHtml.value,
         customs: req.body.data.customs.value, 
         userId: req.body.userId
     });

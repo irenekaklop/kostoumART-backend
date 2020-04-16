@@ -97,7 +97,7 @@ exports.update = (req, res) => {
     });
   }
 
-  console.log("req", req)
+  console.log("Costume Update")
 
   //Prepare arrays
   let _sexsStr = '';
@@ -217,3 +217,8 @@ exports.filter = (req, res) => {
   });
 }
 
+exports.upload = (req, res) => {
+  //console.log(req.body.base64);
+  var fileName = saveImage(req.body.base64);
+  console.log(fileName)
+}

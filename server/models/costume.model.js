@@ -1,4 +1,5 @@
 const sql = require("./db.js");
+const {saveImage} = require("../utils");
 
 // constructor
 const Costume = function(costume) {
@@ -43,7 +44,7 @@ Costume.create = (costume, result) => {
 };
   
 Costume.findById = (costumeId, result) => {
-    sql.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
+    sql.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.imageURL, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -62,7 +63,7 @@ Costume.findById = (costumeId, result) => {
 };
   
 Costume.getAll = (AuthUser, result) => {
-    sql.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
+    sql.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.imageURL, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -75,13 +76,15 @@ Costume.getAll = (AuthUser, result) => {
 };
   
 Costume.updateById = (id, costume, result) => {
-  console.log(costume);
+  var filepath = saveImage(costume.images);
+  console.log(filepath);
   sql.query(
     `UPDATE costumes SET costume_name= '${costume.costume_name}', description= '${costume.description}', 
     descriptionHtml = '${costume.descriptionHtml}',
     date= '${costume.date}' , technique= '${costume.technique}', sex= '${costume.sex}', 
     material= '${costume.material}', actors= '${costume.actors}', location= '${costume.location}', 
     designer= '${costume.designer}', 
+    imageURL= '${filepath}',
     useID= ( SELECT useID FROM uses WHERE name = '${costume.useName}' AND use_category = '${costume.useCategory}'), 
     theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '${costume.theatricalPlayName}') 
     WHERE costume_id=${id}`,
@@ -174,5 +177,6 @@ Costume.filter = (sex, technique, result) => {
   })
   console.log("FILTERS", query);
 }
+
   
 module.exports = Costume;

@@ -4,6 +4,7 @@ const Use = function(use) {
     this.name = use.name;
     this.use_category = use.use_category;
     this.description = use.description;
+    this.descriptionHtml = use.descriptionHtml;
     this.customs = use.customs;
     this.userId = use.userId;
 }
