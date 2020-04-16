@@ -4,12 +4,13 @@ const cors = require("cors");
 const sql = require("./models/db");
 
 const app = express();
+app.use(express.static('public'))
 
 app.use(cors());
 
 // Express middleware that allows POSTing data
-app.use(bodyParser.urlencoded({limit: '50mb'}));
-app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.json({ limit: '100mb' }));
+app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 // default route
 app.get('/', function (req, res) {
@@ -78,4 +79,10 @@ app.get('/checkDuplicate', (req, res) => {
     if(err) throw err;
     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
   });
+});
+
+// Get Uploads
+
+app.get('/uploads/images/:file', function (req, res) {
+  res.sendFile(__dirname + '/uploads/images/' + req.params.file);
 });

@@ -222,3 +222,8 @@ exports.upload = (req, res) => {
   var fileName = saveImage(req.body.base64);
   console.log(fileName)
 }
+
+exports.getFile = (req, res) => {
+  console.log(req.body);
+  res.sendFile(req.body.path, { root: __dirname });
+}
