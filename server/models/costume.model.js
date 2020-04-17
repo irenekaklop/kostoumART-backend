@@ -178,7 +178,7 @@ Costume.filter = (sex, technique, result) => {
     query=query+')'
   }
   pool.getConnection((err, conn) => {
-    sql.query(query, (err, res) => {
+    conn.query(query, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
