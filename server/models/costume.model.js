@@ -85,7 +85,7 @@ Costume.getAll = (AuthUser, result) => {
 };
   
 Costume.updateById = (id, costume, result) => {
-  var filepath = null;
+  var filepath = '';
   if(costume.images){
     filepath = saveImage(costume.images);
     console.log(filepath);
