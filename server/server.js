@@ -1,7 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const sql = require("./models/db");
+const db = require("./models/db.js");
+var pool = db.getPool();
 
 const app = express();
 app.use(express.static('public'))
@@ -35,24 +36,33 @@ app.get('/dependencies', (req, res) => {
     console.log(req.query);
     if(column==="use"){
       query= "SELECT (SELECT EXISTS (select * FROM costumes where useID=?)) OR (SELECT EXISTS (select * FROM accessories where useID=?)) as result"
-      sql.query(query, [index, index],(err, results) => {
-        if(err) throw err;
-        res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-      });
+      pool.getConnection((err, conn)=> {
+        conn.query(query, [index, index],(err, results) => {
+          if(err) throw err;
+          res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+          conn.release();
+        });
+      })
     }
     else if (column==="theatrical_play"){
       query= "SELECT (SELECT EXISTS (select * FROM costumes where theatrical_play_id=?)) OR (SELECT EXISTS (select * FROM accessories where theatricalPlayId=?)) as result;"
-      sql.query(query, [index, index],(err, results) => {
+      pool.getConnection((err, conn)=> {
+        conn.query(query, [index, index],(err, results) => {
         if(err) throw err;
         res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-      });
+        conn.release();
+        });
+      })
     }
     else if (column==='costume'){
       query = "SELECT EXISTS (select * FROM accessories where costumeId=?) as result;"
-      sql.query(query, [index],(err, results) => {
-        if(err) throw err;
-        res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-      });
+      pool.getConnection((err, conn)=> {
+        conn.query(query, [index, index],(err, results) => {
+          if(err) throw err;
+          res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+          conn.release();
+          });
+      })
     }
    
 });
@@ -75,10 +85,13 @@ app.get('/checkDuplicate', (req, res) => {
   if (query === ''){
     throw 'Params incomplete'
   }
-  sql.query(query, (err, results) => {
-    if(err) throw err;
-    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-  });
+  pool.getConnection((err, conn)=> {
+    conn.query(query, (err, results) => {
+      if(err) throw err;
+      res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
+      conn.release();
+    });
+  })
 });
 
 // Get Uploads

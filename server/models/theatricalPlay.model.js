@@ -1,4 +1,5 @@
-const sql = require("./db.js");
+const db = require("./db.js");
+var pool = db.getPool();
 
 const TheatricalPlay = function (theatricalPlay) {
     this.title = theatricalPlay.title;
@@ -10,7 +11,8 @@ const TheatricalPlay = function (theatricalPlay) {
 }
 
 TheatricalPlay.create = (newTheatricalPlay, result) => {
-    sql.query( `INSERT INTO theatrical_plays SET ?`, newTheatricalPlay, (err, res) => {
+  pool.getConnection((err, connection) => {
+    connection.query( `INSERT INTO theatrical_plays SET ?`, newTheatricalPlay, (err, res) => {
         if (err) {
           console.log("error: ", err);
           result(err, null);
@@ -18,11 +20,14 @@ TheatricalPlay.create = (newTheatricalPlay, result) => {
         }
         console.log("created theatrical play: ", { id: res.insertId, ...newTheatricalPlay });
         result(null, { id: res.insertId, ...newTheatricalPlay });
+        connection.release();
     });
+  })
 }
 
 TheatricalPlay.findById = (theatricalPlayId, result) => {
-    sql.query(`SELECT * FROM theatrical_plays WHERE theatrical_play_id= ${theatricalPlayId}`, (err, res) => {
+  pool.getConnection((err, connection) => {
+    connection.query(`SELECT * FROM theatrical_plays WHERE theatrical_play_id= ${theatricalPlayId}`, (err, res) => {
         if (err) {
           console.log("error: ", err);
           result(err, null);
@@ -37,11 +42,15 @@ TheatricalPlay.findById = (theatricalPlayId, result) => {
       
         // not found Item with the id
         result({ kind: "not_found" }, null);
+
+        connection.release();
     });
+  })
 }
 
 TheatricalPlay.getAll = (AuthUser, result) => {
-    sql.query("SELECT *, users.username as createdBy FROM theatrical_plays left join users on theatrical_plays.userId=users.user_id;", (err, res) => {
+  pool.getConnection((err, connection) => {
+    connection.query("SELECT *, users.username as createdBy FROM theatrical_plays left join users on theatrical_plays.userId=users.user_id;", (err, res) => {
         if (err) {
           console.log("error: ", err);
           result(null, err);
@@ -50,11 +59,14 @@ TheatricalPlay.getAll = (AuthUser, result) => {
       
         console.log("theatrical plays: ", res);
         result(null, res);
+        connection.release();
     });
+  })
 }
 
 TheatricalPlay.updateById = (id, theatricalPlay, result) => {
-    sql.query(
+  pool.getConnection((err, connection) => {
+    connection.query(
         `UPDATE theatrical_plays SET ? WHERE theatrical_play_id=${id}`, theatricalPlay,
         (err, res) => {
           if (err) {
@@ -71,11 +83,14 @@ TheatricalPlay.updateById = (id, theatricalPlay, result) => {
       
           console.log("updated theatrical play: ", { id: id, ...theatricalPlay });
           result(null, { id: id, ...theatricalPlay });
+          connection.release();
       });
+    })
 }
 
 TheatricalPlay.remove = (id, result) => {
-    sql.query('DELETE FROM theatrical_plays WHERE theatrical_play_id = ?', id, (err, res) => {
+  pool.getConnection((err, connection) => {
+    connection.query('DELETE FROM theatrical_plays WHERE theatrical_play_id = ?', id, (err, res) => {
         if (err) {
           console.log("error: ", err);
           result(null, err);
@@ -90,7 +105,9 @@ TheatricalPlay.remove = (id, result) => {
       
         console.log("deleted theatrical play with id: ", id);
         result(null, res);
+        connection.release();
       });
+    })
 }
 
 module.exports = TheatricalPlay;

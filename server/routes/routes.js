@@ -17,6 +17,10 @@ module.exports = app => {
 
     app.get("/costumes-filters", costumes.filter);
 
+    app.post("/uploadImage", costumes.upload);
+
+    app.get("/costumeImage", costumes.getFile);
+
     // Accessories
     app.post("/accessory", accessories.create);
 

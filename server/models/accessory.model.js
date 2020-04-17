@@ -1,4 +1,5 @@
-const sql = require("./db.js");
+var db = require("./db.js");
+var pool = db.getPool();
 
 // constructor
 const Accessory = function(accessory) {
@@ -19,7 +20,8 @@ const Accessory = function(accessory) {
 };
 
 Accessory.create = (newAccessory, result) => {
-    sql.query(
+  pool.getConnection((err, connection) => {
+    connection.query(
       `INSERT INTO accessories SET name= '${newAccessory.name}', description= '${newAccessory.description}', 
       descriptionHtml='${newAccessory.descriptionHtml}',
       technique= '${newAccessory.technique}', date=  '${newAccessory.date}', sex= '${newAccessory.sex}', 
@@ -36,11 +38,14 @@ Accessory.create = (newAccessory, result) => {
         }
       console.log("created accessory: ", { id: res.insertId, ...newAccessory });
       result(null, { id: res.insertId, ...newAccessory });
+      connection.release();
     });
+  })
 };
 
 Accessory.findById = (accessoryId, result) => {
-    sql.query(`SELECT accessories.accessory_id, accessories.name, accessories.description, accessories.descriptionHtml,
+  pool.getConnection((err, connection) => {
+    connection.query(`SELECT accessories.accessory_id, accessories.name, accessories.description, accessories.descriptionHtml,
     accessories.useId, accessories.sex, uses.name as use_name, uses.use_category,
     accessories.material, accessories.technique, accessories.date, accessories.location, theatrical_plays.title as tp_title, accessories.designer, accessories.theatricalPlayId, theatrical_plays.title as tp_title, accessories.parts, accessories.actors,  costumes.costume_name FROM accessories LEFT JOIN costumes ON accessories.costumeId = costumes.costume_id LEFT JOIN uses ON accessories.useId = uses.useID LEFT JOIN theatrical_plays ON accessories.theatricalPlayId=theatrical_plays.theatrical_play_id WHERE accessory_id= ${accessoryId}`, (err, res) => {
       if (err) {
@@ -57,25 +62,30 @@ Accessory.findById = (accessoryId, result) => {
   
       // not found Item with the id
       result({ kind: "not_found" }, null);
+
+      connection.release();
     });
+  })
 };
   
 Accessory.getAll = (AuthUser, result) => {
-    sql.query("SELECT accessory_id, accessories.name, accessories.description, accessories.descriptionHtml, accessories.date, accessories.sex, accessories.material, accessories.technique, accessories.location, accessories.designer, accessories.parts, theatrical_plays.title as tp_title, accessories.actors, costumeId, accessories.useId, accessories.userId, users.username as CreatedBy, uses.name as use_name, costumes.costume_name, uses.use_category FROM accessories JOIN (SELECT user_id FROM theaterdb.users where role <= '"+AuthUser+"') S2 ON accessories.userId = S2.user_id left join theatrical_plays ON accessories.theatricalPlayId = theatrical_play_id left join uses ON accessories.useId = uses.useID left join costumes ON accessories.costumeId=costumes.costume_id left join users on accessories.userId=users.user_id;", (err, res) => {
+  pool.getConnection((err, connection) => {
+    connection.query("SELECT accessory_id, accessories.name, accessories.description, accessories.descriptionHtml, accessories.date, accessories.sex, accessories.material, accessories.technique, accessories.location, accessories.designer, accessories.parts, theatrical_plays.title as tp_title, accessories.actors, costumeId, accessories.useId, accessories.userId, users.username as CreatedBy, uses.name as use_name, costumes.costume_name, uses.use_category FROM accessories JOIN (SELECT user_id FROM theaterdb.users where role <= '"+AuthUser+"') S2 ON accessories.userId = S2.user_id left join theatrical_plays ON accessories.theatricalPlayId = theatrical_play_id left join uses ON accessories.useId = uses.useID left join costumes ON accessories.costumeId=costumes.costume_id left join users on accessories.userId=users.user_id;", (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
         return;
       }
-  
       console.log("accessories: ", res);
       result(null, res);
+      connection.release();
     });
+  })
 };
   
 Accessory.updateById = (id, accessory, result) => {
-  console.log(accessory);
-    sql.query(
+  pool.getConnection((err, connection) => {
+    connection.query(
       `UPDATE accessories SET name= '${accessory.name}', description= '${accessory.description}', 
       descriptionHtml='${accessory.descriptionHtml}',
       date='${accessory.date}' , technique= '${accessory.technique}', sex= '${accessory.sex}', 
@@ -100,12 +110,14 @@ Accessory.updateById = (id, accessory, result) => {
   
         console.log("updated accessory: ", { id: id, ...accessory });
         result(null, { id: id, ...accessory });
-      }
-    );
+        connection.release();
+      });
+  })
 };
   
 Accessory.remove = (id, result) => {
-    sql.query('DELETE FROM accessories WHERE accessory_id = ?', id, (err, res) => {
+  pool.getConnection((err, connection) => {
+    connection.query('DELETE FROM accessories WHERE accessory_id = ?', id, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -120,7 +132,9 @@ Accessory.remove = (id, result) => {
   
       console.log("deleted accessory with id: ", id);
       result(null, res);
+      connection.release();
     });
+  })
 };
   
 module.exports = Accessory;

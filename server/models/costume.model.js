@@ -1,4 +1,5 @@
-const sql = require("./db.js");
+var db = require("./db.js");
+var pool = db.getPool();
 const {saveImage} = require("../utils");
 
 // constructor
@@ -22,8 +23,8 @@ const Costume = function(costume) {
 };
 
 Costume.create = (costume, result) => {
-  console.log("costum insert", costume)
-    sql.query(
+  pool.getConnection((err, conn) => {
+    conn.query(
       `INSERT INTO costumes SET costume_name= '${costume.costume_name}', description= '${costume.description}', 
       descriptionHtml = '${costume.descriptionHtml}',
       technique= '${costume.technique}', date=  '${costume.date}', sex= '${costume.sex}', material= '${costume.material}', 
@@ -40,11 +41,14 @@ Costume.create = (costume, result) => {
   
       console.log("created costume: ", { id: res.insertId, ...costume });
       result(null, { id: res.insertId, ...costume });
+      conn.release(); 
     });
+  })
 };
   
 Costume.findById = (costumeId, result) => {
-    sql.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.imageURL, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
+  pool.getConnection((err, conn) => {
+    conn.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.imageURL, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -59,11 +63,14 @@ Costume.findById = (costumeId, result) => {
   
       // not found Cosutme with the id
       result({ kind: "not_found" }, null);
+      conn.release();
     });
+  })
 };
   
 Costume.getAll = (AuthUser, result) => {
-    sql.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.imageURL, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
+  pool.getConnection((err, connection) => {
+    connection.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.imageURL, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -72,43 +79,52 @@ Costume.getAll = (AuthUser, result) => {
   
       console.log("costumes: ", res);
       result(null, res);
+      connection.release();
     });
+  })
 };
   
 Costume.updateById = (id, costume, result) => {
-  var filepath = saveImage(costume.images);
-  console.log(filepath);
-  sql.query(
-    `UPDATE costumes SET costume_name= '${costume.costume_name}', description= '${costume.description}', 
-    descriptionHtml = '${costume.descriptionHtml}',
-    date= '${costume.date}' , technique= '${costume.technique}', sex= '${costume.sex}', 
-    material= '${costume.material}', actors= '${costume.actors}', location= '${costume.location}', 
-    designer= '${costume.designer}', 
-    imageURL= '${filepath}',
-    useID= ( SELECT useID FROM uses WHERE name = '${costume.useName}' AND use_category = '${costume.useCategory}'), 
-    theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '${costume.theatricalPlayName}') 
-    WHERE costume_id=${id}`,
-      (err, res) => {
-        if (err) {
-            console.log("error: ", err);
-            result(null, err);
+  var filepath = null;
+  if(costume.images){
+    filepath = saveImage(costume.images);
+    console.log(filepath);
+  }
+  pool.getConnection((err, conn) => {
+    conn.query(
+      `UPDATE costumes SET costume_name= '${costume.costume_name}', description= '${costume.description}', 
+      descriptionHtml = '${costume.descriptionHtml}',
+      date= '${costume.date}' , technique= '${costume.technique}', sex= '${costume.sex}', 
+      material= '${costume.material}', actors= '${costume.actors}', location= '${costume.location}', 
+      designer= '${costume.designer}', 
+      imageURL= '${filepath}',
+      useID= ( SELECT useID FROM uses WHERE name = '${costume.useName}' AND use_category = '${costume.useCategory}'), 
+      theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '${costume.theatricalPlayName}') 
+      WHERE costume_id=${id}`,
+        (err, res) => {
+          if (err) {
+              console.log("error: ", err);
+              result(null, err);
+              return;
+          }
+    
+          if (res.affectedRows == 0) {
+            // not found Costume with the id
+            result({ kind: "not_found" }, null);
             return;
+          }
+    
+          console.log("updated costume: ", { id: id, ...costume });
+          result(null, { id: id, ...costume });
+          conn.release();
         }
-  
-        if (res.affectedRows == 0) {
-          // not found Costume with the id
-          result({ kind: "not_found" }, null);
-          return;
-        }
-  
-        console.log("updated costume: ", { id: id, ...costume });
-        result(null, { id: id, ...costume });
-      }
-    );
+      );
+  })
 };
   
 Costume.remove = (id, result) => {
-    sql.query("DELETE FROM costumes WHERE costume_id = ?", id, (err, res) => {
+  pool.getConnection((err, conn) => {
+    conn.query("DELETE FROM costumes WHERE costume_id = ?", id, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -123,7 +139,9 @@ Costume.remove = (id, result) => {
   
       console.log("deleted costume with id: ", id);
       result(null, res);
+      conn.release();
     });
+  })
 };
 
 Costume.filter = (sex, technique, result) => {
@@ -159,21 +177,24 @@ Costume.filter = (sex, technique, result) => {
     }
     query=query+')'
   }
-  sql.query(query, (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
-      return;
-    }
+  pool.getConnection((err, conn) => {
+    sql.query(query, (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
 
-    if (res.affectedRows == 0) {
-      // not found Costume with the id
-      result({ kind: "not_found" }, null);
-      return;
-    }
+      if (res.affectedRows == 0) {
+        // not found Costume with the id
+        result({ kind: "not_found" }, null);
+        return;
+      }
 
-    console.log("Filter succeed");
-    result(null, res);
+      console.log("Filter succeed");
+      result(null, res);
+      conn.release();
+    })
   })
   console.log("FILTERS", query);
 }
