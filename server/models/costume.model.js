@@ -47,7 +47,7 @@ Costume.create = (costume, result) => {
   
 Costume.findById = (costumeId, result) => {
   pool.getConnection((err, conn) => {
-    conn.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
+    conn.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -69,7 +69,7 @@ Costume.findById = (costumeId, result) => {
   
 Costume.getAll = (AuthUser, result) => {
   pool.getConnection((err, connection) => {
-    connection.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
+    connection.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -142,7 +142,7 @@ Costume.filter = (sex, technique, result) => {
   console.log(sex, technique)
   let query = `SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.date, costumes.useID, costumes.sex, 
   uses.name as use_name, costumes.userId as costumeCreator, costumes.material, costumes.technique, 
-  costumes.location, costumes.location_influence, costumes.designer, costumes.theatrical_play_id, 
+  costumes.location, costumes.designer, costumes.theatrical_play_id, 
   theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes 
   JOIN (SELECT user_id FROM users where role <= 1) S2 ON costumes.userId = S2.user_id 
   left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id 
