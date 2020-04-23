@@ -13,11 +13,23 @@ function saveImage(baseImage) {
     const base64Data = baseImage.replace(regex, "");
     const rand = Math.ceil(Math.random()*1000);
     //Random photo name with timeStamp so it will not overide previous images.
-    const filename = `Photo_${Date.now()}_${rand}.${ext}`;
+    const filename = `Image_${Date.now()}_${rand}.${ext}`;
         
     fs.writeFileSync(localPath + filename, base64Data, 'base64');
-    var path = '/uploads/images/'+filename;
-    return path;
+    var path = 'uploads/images/'+filename;
+    return {filename, path};
 }
 
-module.exports = {saveImage};
+function removeImage(path) {
+    if(path){
+        console.log("Removing", './server/' + path)
+        fs.unlink('./server/' + path, function(error){
+            if (error) {
+                console.log('Failed to delete file.', error);
+            }
+        })
+        return;
+    }
+}
+
+module.exports = {saveImage, removeImage};

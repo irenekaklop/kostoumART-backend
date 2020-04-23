@@ -1,4 +1,5 @@
 const Accessory = require("../models/accessory.model.js");
+const {saveImage, removeImage} = require("../utils");
 
 // Create and Save a new Item
 exports.create = (req, res) => {
@@ -7,6 +8,24 @@ exports.create = (req, res) => {
     res.status(400).send({
       message: "Content can not be empty!"
     });
+  }
+
+  //To upload images
+  let images = req.body.data.images.value;
+  let imagesObj = [];
+  if(images.length>0){
+    images.map(image => {
+      if(!image.isUploaded){
+        const uploadResult = saveImage(image.base64);
+        console.log(uploadResult);
+        imagesObj = imagesObj.concat([{
+            path: uploadResult.path
+          }])
+      }
+      else{
+        imagesObj = imagesObj.concat([{ path: image.path}])
+      }
+    })
   }
 
   //Prepare arrays
@@ -32,7 +51,8 @@ exports.create = (req, res) => {
     location: req.body.data.location.value,
     designer: req.body.data.designer.value,
     theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
-    userId: req.body.user
+    userId: req.body.user,
+    images: imagesObj
   });
 
   // Save Item in the database
@@ -85,6 +105,32 @@ exports.update = (req, res) => {
         message: "Content can not be empty!"
         });
     }
+    //To upload images
+    let images = req.body.data.images.value;
+    let imagesObj = [];
+    if(images.length>0){
+      images.map(image => {
+        console.log(image);
+        if(!image.isUploaded){
+          const uploadResult = saveImage(image.base64);
+          console.log(uploadResult);
+          imagesObj = imagesObj.concat([{
+              path: uploadResult.path
+            }])
+        }
+        else{
+          imagesObj = imagesObj.concat([{ path: image.path}])
+        }
+      })
+    }
+
+    //Remove images if needed
+    let removed = req.body.data.removedImages.value;
+    if(removed.length>0){
+      removed.map(image => {
+        removeImage(image.path);
+      })
+    }
 
     //Prepare arrays
     let _sexsStr = '';
@@ -109,7 +155,9 @@ exports.update = (req, res) => {
         location: req.body.data.location.value,
         designer: req.body.data.designer.value,
         theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
-        userId: req.body.user
+        userId: req.body.user,
+        images: imagesObj
+        
     });
 
     console.log(req.body, accessory);

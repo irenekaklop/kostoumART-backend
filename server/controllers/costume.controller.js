@@ -1,4 +1,5 @@
 const Costume = require("../models/costume.model.js");
+const {saveImage, removeImage} = require("../utils");
 
 // Create and Save a new Costume
 exports.create = (req, res) => {
@@ -8,7 +9,24 @@ exports.create = (req, res) => {
       message: "Content can not be empty!"
     });
   }
-
+  
+  //To upload images
+  let images = req.body.data.images.value;
+  let imagesObj = [];
+  if(images.length>0){
+    images.map(image => {
+      if(!image.isUploaded){
+        const uploadResult = saveImage(image.base64);
+        console.log(uploadResult);
+        imagesObj = imagesObj.concat([{
+            path: uploadResult.path
+          }])
+      }
+      else{
+        imagesObj = imagesObj.concat([{ path: image.path}])
+      }
+    })
+  }
   //Prepare arrays
   let _sexsStr = '';
   let _materialsStr = '';
@@ -40,7 +58,7 @@ exports.create = (req, res) => {
     designer: req.body.data.designer.value,
     theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
     parts: req.body.data.parts.value,
-    images: req.body.data.images.value,
+    images: imagesObj,
     userId: req.body.user
   });
 
@@ -97,7 +115,32 @@ exports.update = (req, res) => {
     });
   }
 
-  console.log("Costume Update")
+  //To upload images
+  let images = req.body.data.images.value;
+  let imagesObj = [];
+  if(images.length>0){
+    images.map(image => {
+      console.log(image);
+      if(!image.isUploaded){
+        const uploadResult = saveImage(image.base64);
+        console.log(uploadResult);
+        imagesObj = imagesObj.concat([{
+            path: uploadResult.path
+          }])
+      }
+      else{
+        imagesObj = imagesObj.concat([{ path: image.path}])
+      }
+    })
+  }
+
+  //Remove images if needed
+  let removed = req.body.data.removedImages.value;
+  if(removed.length>0){
+    removed.map(image => {
+      removeImage(image.path);
+    })
+  }
 
   //Prepare arrays
   let _sexsStr = '';
@@ -130,7 +173,7 @@ exports.update = (req, res) => {
     designer: req.body.data.designer.value,
     theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
     parts: req.body.data.parts.value,
-    images: req.body.data.images.value,
+    images: imagesObj,
     userId: req.body.user
   });
 
@@ -215,12 +258,6 @@ exports.filter = (req, res) => {
       }
     } else res.send(data);
   });
-}
-
-exports.upload = (req, res) => {
-  //console.log(req.body.base64);
-  var fileName = saveImage(req.body.base64);
-  console.log(fileName)
 }
 
 exports.getFile = (req, res) => {
