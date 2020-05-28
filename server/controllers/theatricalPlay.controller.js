@@ -8,17 +8,17 @@ exports.create = (req, res) => {
             message: "Content can not be empty!"
         });
     }
-    let _datesStr = '';
-    for (let i=0; i < req.body.data.dates.value.length; i++){
-        _datesStr = _datesStr + req.body.data.dates.value[i].value;
-        if(i !== req.body.data.dates.value.length-1){
-            _datesStr = _datesStr + ", ";   
+    let _yearsStr = '';
+    for (let i=0; i < req.body.data.years.value.length; i++){
+        _yearsStr = _yearsStr + req.body.data.years.value[i].value;
+        if(i !== req.body.data.years.value.length-1){
+            _yearsStr = _yearsStr + ", ";   
         }
     }
 
     const theatricalPlay = new TheatricalPlay({
         title: req.body.data.name.value, 
-        date: _datesStr, 
+        years: _yearsStr, 
         actors: req.body.data.actors.value, 
         director: req.body.data.director.value, 
         theater: req.body.data.theater.value, 
@@ -75,17 +75,17 @@ exports.update = (req, res) => {
         message: "Content can not be empty!"
     });}
 
-    let _datesStr = '';
-    for (let i=0; i < req.body.data.dates.value.length; i++){
-      _datesStr = _datesStr + req.body.data.dates.value[i].value;
-      if(i !== req.body.data.dates.value.length-1){
-        _datesStr = _datesStr + ", ";
+    let _yearsStr = '';
+    for (let i=0; i < req.body.data.years.value.length; i++){
+      _yearsStr = _yearsStr + req.body.data.years.value[i].value;
+      if(i !== req.body.data.years.value.length-1){
+        _yearsStr = _yearsStr + ", ";
       }
     }
     
     const theatricalPlay = new TheatricalPlay({
         title: req.body.data.name.value, 
-        date: _datesStr, 
+        years: _yearsStr, 
         actors: req.body.data.actors.value, 
         director: req.body.data.director.value, 
         theater: req.body.data.theater.value, 

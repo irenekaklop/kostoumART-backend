@@ -5,7 +5,7 @@ const TheatricalPlay = function (theatricalPlay) {
     this.title = theatricalPlay.title;
     this.director = theatricalPlay.director;
     this.theater = theatricalPlay.theater;
-    this.date = theatricalPlay.date;
+    this.years = theatricalPlay.years;
     this.actors = theatricalPlay.actors;
     this.userId = theatricalPlay.userId;
 }
