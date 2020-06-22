@@ -1,20 +1,24 @@
 const db = require("../models");
 const User = db.users;
 var jwt = require('jsonwebtoken');
-const fs = require('fs')
+const fs = require('fs');
+const { USER } = require("../config/db.sequelize.config");
 
 process.env.SECRET_KEY = 'secret'
 
 exports.signin = (req, res) => {
   var datetime = new Date();
-  
   User.findOne({
     where: {
-      email: req.body.email
+      email: req.body.email,
     }
   }).then(user => {
     if (user) {
       if (req.body.password === user.dataValues.password) {
+        user.dataValues.lastLogin = datetime;
+        user.update({
+          lastLogin: new Date()
+        })
         var LoginData = user.dataValues.email + '  ' + datetime + '\n'
         fs.appendFile('./server/logs/logFile', LoginData, function (err) {
         if (err) throw err;
