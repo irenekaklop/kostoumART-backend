@@ -17,20 +17,23 @@ const Costume = function(costume) {
     this.useName = costume.useName;
     this.useCategory = costume.useCategory;
     this.theatricalPlayName = costume.theatricalPlayName;
-    this.userId = costume.userId;
+    this.createdBy = costume.createdBy;
     this.images = costume.images;
 };
 
 Costume.create = (costume, result) => {
   pool.getConnection((err, conn) => {
     conn.query(
-      `INSERT INTO costumes SET costume_name= '${costume.costume_name}', description= '${costume.description}', 
-      descriptionHtml = '${costume.descriptionHtml}',
-      technique= '${costume.technique}', date=  '${costume.date}', sex= '${costume.sex}', material= '${costume.material}', 
-      actors= '${costume.actors}', location= '${costume.location}', designer= '${costume.designer}', 
-      parts= '${costume.parts}', images = '${JSON.stringify(costume.images)}',
-      useID= ( SELECT useID FROM uses WHERE name = '${costume.useName}' AND use_category = '${costume.useCategory}'), 
-      theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '${costume.theatricalPlayName}'), userId = ${costume.userId}`, 
+      `INSERT INTO costumes SET costume_name= ?, description= ?, descriptionHtml = ?,
+      technique= ?, date= ?, sex= ?, material= ?, 
+      actors= ?, location= ?, designer= ?, parts= ?, images = ?,
+      useID= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), 
+      theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?), 
+      createdBy = (select user_id from users where username = ?)`, 
+      [ costume.costume_name, costume.description, costume.descriptionHtml, costume.technique, costume.date,
+        costume.sex, costume.material, costume.actors, costume.location, costume.designer, costume.parts,
+        JSON.stringify(costume.images), costume.useName, costume.useCategory, costume.theatricalPlayName,
+        costume.createdBy ],
       (err, res) => {
         if (err) {
           console.log("error: ", err);
@@ -47,7 +50,7 @@ Costume.create = (costume, result) => {
   
 Costume.findById = (costumeId, result) => {
   pool.getConnection((err, conn) => {
-    conn.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ${costumeId}`, (err, res) => {
+    conn.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ?`, [costumeId], (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -69,7 +72,14 @@ Costume.findById = (costumeId, result) => {
   
 Costume.getAll = (AuthUser, result) => {
   pool.getConnection((err, connection) => {
-    connection.query("SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.date, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.userId as costumeCreator, users.username as createdBy, costumes.material, costumes.technique, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes JOIN (SELECT user_id FROM users where role <= '"+AuthUser+"') S2 ON costumes.userId = S2.user_id left join users on costumes.userId=users.user_id left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID", (err, res) => {
+    connection.query(
+      `SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.date, 
+      costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, users.username as createdBy, costumes.material,
+      costumes.technique, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes 
+      JOIN (SELECT user_id FROM users where role <= ?) S2 ON costumes.createdBy = S2.user_id left join users on costumes.createdBy=users.user_id 
+      left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID`,
+    [AuthUser],
+    (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -86,15 +96,16 @@ Costume.getAll = (AuthUser, result) => {
 Costume.updateById = (id, costume, result) => {
   pool.getConnection((err, conn) => {
     conn.query(
-      `UPDATE costumes SET costume_name= '${costume.costume_name}', description= '${costume.description}', 
-      descriptionHtml = '${costume.descriptionHtml}',
-      date= '${costume.date}' , technique= '${costume.technique}', sex= '${costume.sex}', 
-      material= '${costume.material}', actors= '${costume.actors}', location= '${costume.location}', 
-      designer= '${costume.designer}', 
-      images= '${JSON.stringify(costume.images)}',
-      useID= ( SELECT useID FROM uses WHERE name = '${costume.useName}' AND use_category = '${costume.useCategory}'), 
-      theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = '${costume.theatricalPlayName}') 
-      WHERE costume_id=${id}`,
+      `UPDATE costumes SET costume_name=  ?, description= ?, 
+      descriptionHtml = ?, date= ? , technique= ?, sex= ?, 
+      material= ?, actors= ?, location= ?, designer= ?, images= ?,
+      useID= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), 
+      theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?) 
+      WHERE costume_id=?`,
+      [costume.costume_name, costume.description, costume.descriptionHtml, costume.date, costume.technique, costume.sex,
+        costume.material, costume.actors, costume.location, costume.designer, JSON.stringify(costume.images),
+        costume.useName, costume.useCategory, costume.theatricalPlayName, id]
+      ,
         (err, res) => {
           if (err) {
               console.log("error: ", err);
@@ -141,10 +152,10 @@ Costume.remove = (id, result) => {
 Costume.filter = (sex, technique, result) => {
   console.log(sex, technique)
   let query = `SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.date, costumes.useID, costumes.sex, 
-  uses.name as use_name, costumes.userId as costumeCreator, costumes.material, costumes.technique, 
+  uses.name as use_name, costumes.createdBy, costumes.material, costumes.technique, 
   costumes.location, costumes.designer, costumes.theatrical_play_id, 
   theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes 
-  JOIN (SELECT user_id FROM users where role <= 1) S2 ON costumes.userId = S2.user_id 
+  JOIN (SELECT user_id FROM users where role <= 1) S2 ON costumes.createdBy = S2.user_id 
   left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id 
   left join uses ON costumes.useID = uses.useID`
   if(technique || sex){

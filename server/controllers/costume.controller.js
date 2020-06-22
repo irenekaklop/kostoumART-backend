@@ -27,6 +27,7 @@ exports.create = (req, res) => {
       }
     })
   }
+
   //Prepare arrays
   let _sexsStr = '';
   let _materialsStr = '';
@@ -59,7 +60,7 @@ exports.create = (req, res) => {
     theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
     parts: req.body.data.parts.value,
     images: imagesObj,
-    userId: req.body.user
+    createdBy: req.body.createdBy
   });
 
   console.log("Costume ", costume);
@@ -76,17 +77,17 @@ exports.create = (req, res) => {
 };
 
 // Retrieve all Costumes from the database.
-exports.findAll = (req, res) => {
-    let AuthUser = req.query.user;
-    console.log("AuthUser", AuthUser);
-    Costume.getAll( AuthUser, (err, data) => {
-        if (err)
-          res.status(500).send({
-            message:
-              err.message || "Some error occurred while retrieving costumes."
-          });
-        else res.send(data);
-    });
+exports.findAll = (req, res) => {  
+  let AuthUser = req.query.userType;
+  console.log("(findAll)  AuthUser", AuthUser);
+  Costume.getAll( AuthUser, (err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving costumes."
+        });
+    else res.send(data);
+  });
 };
 
 // Find a single Costume with a costumeId
@@ -174,7 +175,6 @@ exports.update = (req, res) => {
     theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
     parts: req.body.data.parts.value,
     images: imagesObj,
-    userId: req.body.user
   });
 
 
@@ -219,7 +219,7 @@ exports.filter = (req, res) => {
     });
   }
 
-  let AuthUser = req.query.user;
+  let AuthUser = req.query.userType;
   console.log("AuthUser", AuthUser);
   let filters = req.query.filters;
   console.log("filters", filters)

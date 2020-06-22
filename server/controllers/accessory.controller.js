@@ -37,6 +37,8 @@ exports.create = (req, res) => {
     }
   }
 
+  console.log("accessory::create AuthUser", req.body.createdBy);
+  
   const accessory = new Accessory({
     name: req.body.data.name.value,
     description: req.body.data.description.value,
@@ -51,7 +53,7 @@ exports.create = (req, res) => {
     location: req.body.data.location.value,
     designer: req.body.data.designer.value,
     theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
-    userId: req.body.user,
+    createdBy: req.body.createdBy,
     images: imagesObj
   });
 
@@ -68,8 +70,8 @@ exports.create = (req, res) => {
 
 // Retrieve all Items from the database.
 exports.findAll = (req, res) => {
-    let AuthUser = req.query.user;
-    console.log("AuthUser", AuthUser);
+    let AuthUser = req.query.userType;
+    console.log("(accessory::findAll) AuthUser Type", AuthUser);
     Accessory.getAll( AuthUser, (err, data) => {
         if (err)
           res.status(500).send({
@@ -155,7 +157,6 @@ exports.update = (req, res) => {
         location: req.body.data.location.value,
         designer: req.body.data.designer.value,
         theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
-        userId: req.body.user,
         images: imagesObj
         
     });

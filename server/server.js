@@ -1,13 +1,19 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const fs = require("fs");
+const cron = require("node-cron");
 const db = require("./models/db.js");
+const db_config = require('./config/db.config');
+const mysqlBackup =  require('./database/database-backup.js');
+
 var pool = db.getPool();
 
 const app = express();
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-auth');
   res.header('Access-Control-Expose-Headers', 'x-auth');
@@ -28,6 +34,18 @@ app.get('/', function (req, res) {
 // include routes
 require("./routes/routes.js")(app);
 require('./routes/users.routes')(app);
+
+// schedule daily DB backup
+cron.schedule("* 23 * * *", function() {
+  console.log("Daily back up of the database");
+  mysqlBackup();
+});
+
+// schedule weekly DB backup every Sunday
+cron.schedule("* * * * 7", function() {
+  console.log("Weekly back up of the database");
+  mysqlBackup();
+});
 
 // set port, listen for requests
 app.listen(8108, () => {
@@ -78,22 +96,22 @@ app.get('/dependencies', (req, res) => {
 app.get('/checkDuplicate', (req, res) => {
   let query = '';
   if(req.query.item==='accessory'){
-    query = "SELECT * FROM accessories WHERE name='"+req.query.name+"'";
+    query = "SELECT * FROM accessories WHERE name=?";
   }
   else if (req.query.item==='costume'){
-    query = "SELECT * FROM costumes WHERE costume_name='"+req.query.name+"'";
+    query = "SELECT * FROM costumes WHERE costume_name=?";
   }
   else if (req.query.item==='use'){
-    query = "SELECT * FROM uses WHERE name='"+req.query.name+"'";
+    query = "SELECT * FROM uses WHERE name=?";
   }
   else if (req.query.item==='theatrical_play'){
-    query = "SELECT * FROM theatrical_plays WHERE title='"+req.query.name+"'";
+    query = "SELECT * FROM theatrical_plays WHERE title=?";
   }
   if (query === ''){
     throw 'Params incomplete'
   }
   pool.getConnection((err, conn)=> {
-    conn.query(query, (err, results) => {
+    conn.query(query, req.query.name, (err, results) => {
       if(err) throw err;
       res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
       conn.release();
