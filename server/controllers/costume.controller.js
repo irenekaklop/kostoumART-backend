@@ -9,24 +9,6 @@ exports.create = (req, res) => {
       message: "Content can not be empty!"
     });
   }
-  
-  //To upload images
-  let images = req.body.data.images.value;
-  let imagesObj = [];
-  if(images.length>0){
-    images.map(image => {
-      if(!image.isUploaded){
-        const uploadResult = saveImage(image.base64);
-        console.log(uploadResult);
-        imagesObj = imagesObj.concat([{
-            path: uploadResult.path
-          }])
-      }
-      else{
-        imagesObj = imagesObj.concat([{ path: image.path}])
-      }
-    })
-  }
 
   //Prepare arrays
   let _sexsStr = '';
@@ -43,6 +25,23 @@ exports.create = (req, res) => {
       _materialsStr=_materialsStr+', ';
     }
   }
+
+    //To upload images
+    let images = req.body.data.images.value;
+    let imagesObj = [];
+    if(images.length>0){
+      images.map(image => {
+        if(!image.isUploaded){
+          const uploadResult = saveImage(image.base64);
+          imagesObj = imagesObj.concat([{
+              path: uploadResult.path
+            }])
+        }
+        else{
+          imagesObj = imagesObj.concat([{ path: image.path}])
+        }
+      })
+    }
 
   const costume = new Costume({
     costume_name: req.body.data.name.value,
@@ -62,8 +61,6 @@ exports.create = (req, res) => {
     images: imagesObj,
     createdBy: req.body.createdBy
   });
-
-  console.log("Costume ", costume);
   
   // Save Item in the database
   Costume.create(costume, (err, data) => {
@@ -79,7 +76,6 @@ exports.create = (req, res) => {
 // Retrieve all Costumes from the database.
 exports.findAll = (req, res) => {  
   let AuthUser = req.query.userType;
-  console.log("(findAll)  AuthUser", AuthUser);
   Costume.getAll( AuthUser, (err, data) => {
     if (err)
       res.status(500).send({
@@ -121,10 +117,8 @@ exports.update = (req, res) => {
   let imagesObj = [];
   if(images.length>0){
     images.map(image => {
-      console.log(image);
       if(!image.isUploaded){
         const uploadResult = saveImage(image.base64);
-        console.log(uploadResult);
         imagesObj = imagesObj.concat([{
             path: uploadResult.path
           }])

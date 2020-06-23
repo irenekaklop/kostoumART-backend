@@ -39,7 +39,6 @@ exports.create = (req, res) => {
 // Retrieve all Items from the database.
 exports.findAll = (req, res) => {
     let AuthUser = req.query.user;
-    console.log("AuthUser", AuthUser);
     TheatricalPlay.getAll( AuthUser, (err, data) => {
         if (err)
             res.status(500).send({

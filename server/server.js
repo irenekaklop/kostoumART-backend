@@ -35,15 +35,9 @@ app.get('/', function (req, res) {
 require("./routes/routes.js")(app);
 require('./routes/users.routes')(app);
 
-// schedule daily DB backup
+// schedule daily DB backup at 11pm
 cron.schedule("* 23 * * *", function() {
   console.log("Daily back up of the database");
-  mysqlBackup();
-});
-
-// schedule weekly DB backup every Sunday
-cron.schedule("* * * * 7", function() {
-  console.log("Weekly back up of the database");
   mysqlBackup();
 });
 

@@ -14,7 +14,7 @@ Use.create = (newUse, result) => {
   pool.getConnection((err, connection) => {
     connection.query( `INSERT INTO uses SET ?`, newUse, (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::Use.create ", err);
         result(err, null);
         return;
       }
@@ -29,7 +29,7 @@ Use.findById = (useId, result) => {
   pool.getConnection((err, connection) => {
     connection.query(`SELECT * FROM uses WHERE useID= ${useId}`, (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::Use.findById ", err);
         result(err, null);
         return;
       }
@@ -51,12 +51,10 @@ Use.getAll = (AuthUser, result) => {
   pool.getConnection((err, connection) => {
     connection.query("SELECT *, users.username as createdBy FROM theaterdb.uses left join users on uses.userId=users.user_id;", (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::Use.getAll ", err);
         result(null, err);
         return;
       }
-    
-      console.log("uses: ", res);
       result(null, res);
       connection.release();
     });
@@ -69,7 +67,7 @@ Use.updateById = (id, use, result) => {
       `UPDATE uses SET ? WHERE useID=${id}`, use,
       (err, res) => {
         if (err) {
-          console.log("error: ", err);
+          console.log("error::Use.updateById ", err);
           result(null, err);
           return;
         }
@@ -91,7 +89,7 @@ Use.remove = (id, result) => {
   pool.getConnection((err, connection) => {
     connection.query('DELETE FROM uses WHERE useID = ?', id, (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::Use.remove ", err);
         result(null, err);
         return;
       }

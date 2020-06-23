@@ -21,13 +21,13 @@ exports.signin = (req, res) => {
         })
         var LoginData = user.dataValues.email + '  ' + datetime + '\n'
         fs.appendFile('./server/logs/logFile', LoginData, function (err) {
-        if (err) throw err;
-        console.log('Saved!');
+          if (err) throw err;
         });
     
         let token = jwt.sign(user.dataValues, process.env.SECRET_KEY, {
             expiresIn: '7d'
         })
+        
         res.setHeader('x-auth', token);
         res.status(200).send(token);
       }

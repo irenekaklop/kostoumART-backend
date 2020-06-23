@@ -14,7 +14,7 @@ TheatricalPlay.create = (newTheatricalPlay, result) => {
   pool.getConnection((err, connection) => {
     connection.query( `INSERT INTO theatrical_plays SET ?`, newTheatricalPlay, (err, res) => {
         if (err) {
-          console.log("error: ", err);
+          console.log("error::TheatricalPlay.create ", err);
           result(err, null);
           return;
         }
@@ -29,7 +29,7 @@ TheatricalPlay.findById = (theatricalPlayId, result) => {
   pool.getConnection((err, connection) => {
     connection.query(`SELECT * FROM theatrical_plays WHERE theatrical_play_id= ${theatricalPlayId}`, (err, res) => {
         if (err) {
-          console.log("error: ", err);
+          console.log("error::TheatricalPlay.findById ", err);
           result(err, null);
           return;
         }
@@ -52,12 +52,12 @@ TheatricalPlay.getAll = (AuthUser, result) => {
   pool.getConnection((err, connection) => {
     connection.query("SELECT *, users.username as createdBy FROM theatrical_plays left join users on theatrical_plays.userId=users.user_id;", (err, res) => {
         if (err) {
-          console.log("error: ", err);
+          console.log("error::TheatricalPlay.getAll ", err);
           result(null, err);
           return;
         }
       
-        console.log("theatrical plays: ", res);
+        //console.log("theatrical plays: ", res);
         result(null, res);
         connection.release();
     });
@@ -70,7 +70,7 @@ TheatricalPlay.updateById = (id, theatricalPlay, result) => {
         `UPDATE theatrical_plays SET ? WHERE theatrical_play_id=${id}`, theatricalPlay,
         (err, res) => {
           if (err) {
-            console.log("error: ", err);
+            console.log("error::TheatricalPlay.updateById ", err);
             result(null, err);
             return;
           }
@@ -92,7 +92,7 @@ TheatricalPlay.remove = (id, result) => {
   pool.getConnection((err, connection) => {
     connection.query('DELETE FROM theatrical_plays WHERE theatrical_play_id = ?', id, (err, res) => {
         if (err) {
-          console.log("error: ", err);
+          console.log("error::TheatricalPlay.remove ", err);
           result(null, err);
           return;
         }

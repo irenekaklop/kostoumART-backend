@@ -17,7 +17,6 @@ exports.create = (req, res) => {
     images.map(image => {
       if(!image.isUploaded){
         const uploadResult = saveImage(image.base64);
-        console.log(uploadResult);
         imagesObj = imagesObj.concat([{
             path: uploadResult.path
           }])
@@ -36,8 +35,6 @@ exports.create = (req, res) => {
       _sexsStr = _sexsStr + ", ";
     }
   }
-
-  console.log("accessory::create AuthUser", req.body.createdBy);
   
   const accessory = new Accessory({
     name: req.body.data.name.value,
@@ -71,7 +68,6 @@ exports.create = (req, res) => {
 // Retrieve all Items from the database.
 exports.findAll = (req, res) => {
     let AuthUser = req.query.userType;
-    console.log("(accessory::findAll) AuthUser Type", AuthUser);
     Accessory.getAll( AuthUser, (err, data) => {
         if (err)
           res.status(500).send({
@@ -112,10 +108,8 @@ exports.update = (req, res) => {
     let imagesObj = [];
     if(images.length>0){
       images.map(image => {
-        console.log(image);
         if(!image.isUploaded){
           const uploadResult = saveImage(image.base64);
-          console.log(uploadResult);
           imagesObj = imagesObj.concat([{
               path: uploadResult.path
             }])
@@ -161,7 +155,6 @@ exports.update = (req, res) => {
         
     });
 
-    console.log(req.body, accessory);
     Accessory.updateById( req.params.accessoryId, accessory, (err, data) => {
         if (err) {
             if (err.kind === "not_found") {

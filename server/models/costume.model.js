@@ -81,12 +81,12 @@ Costume.getAll = (AuthUser, result) => {
     [AuthUser],
     (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::Costume.getAll ", err);
         result(null, err);
         return;
       }
   
-      console.log("costumes: ", res);
+      //console.log("costumes: ", res);
       result(null, res);
       connection.release();
     });
@@ -108,7 +108,7 @@ Costume.updateById = (id, costume, result) => {
       ,
         (err, res) => {
           if (err) {
-              console.log("error: ", err);
+              console.log("error::Costume.updateById", err);
               result(null, err);
               return;
           }
@@ -131,7 +131,7 @@ Costume.remove = (id, result) => {
   pool.getConnection((err, conn) => {
     conn.query("DELETE FROM costumes WHERE costume_id = ?", id, (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::Costume.remove ", err);
         result(null, err);
         return;
       }
@@ -150,7 +150,6 @@ Costume.remove = (id, result) => {
 };
 
 Costume.filter = (sex, technique, result) => {
-  console.log(sex, technique)
   let query = `SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.date, costumes.useID, costumes.sex, 
   uses.name as use_name, costumes.createdBy, costumes.material, costumes.technique, 
   costumes.location, costumes.designer, costumes.theatrical_play_id, 

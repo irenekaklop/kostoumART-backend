@@ -38,7 +38,7 @@ Accessory.create = (newAccessory, result) => {
       ],
       (err, res) => {
         if (err) {
-          console.log("error: ", err);
+          console.log("error::Accessory.create ", err);
           result(err, null);
           return;
         }
@@ -55,7 +55,7 @@ Accessory.findById = (accessoryId, result) => {
     accessories.useId, accessories.sex, accessories.images, uses.name as use_name, uses.use_category,
     accessories.material, accessories.technique, accessories.date, accessories.location, theatrical_plays.title as tp_title, accessories.designer, accessories.theatricalPlayId, theatrical_plays.title as tp_title, accessories.parts, accessories.actors,  costumes.costume_name FROM accessories LEFT JOIN costumes ON accessories.costumeId = costumes.costume_id LEFT JOIN uses ON accessories.useId = uses.useID LEFT JOIN theatrical_plays ON accessories.theatricalPlayId=theatrical_plays.theatrical_play_id WHERE accessory_id= ?`, accessoryId, (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::Accessory.findById ", err);
         result(err, null);
         return;
       }
@@ -78,11 +78,11 @@ Accessory.getAll = (AuthUser, result) => {
   pool.getConnection((err, connection) => {
     connection.query("SELECT accessory_id, accessories.name, accessories.description, accessories.descriptionHtml, accessories.images, accessories.date, accessories.sex, accessories.material, accessories.technique, accessories.location, accessories.designer, accessories.parts, theatrical_plays.title as tp_title, accessories.actors, costumeId, accessories.useId, users.username as createdBy, uses.name as use_name, costumes.costume_name, uses.use_category FROM accessories JOIN (SELECT user_id FROM theaterdb.users where role <= '"+AuthUser+"') S2 ON accessories.createdBy = S2.user_id left join theatrical_plays ON accessories.theatricalPlayId = theatrical_play_id left join uses ON accessories.useId = uses.useID left join costumes ON accessories.costumeId=costumes.costume_id left join users on accessories.createdBy=users.user_id;", (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::error::Accessory.getAll ", err);
         result(null, err);
         return;
       }
-      console.log("accessories: ", res);
+      //console.log("accessories: ", res);
       result(null, res);
       connection.release();
     });
@@ -108,7 +108,7 @@ Accessory.updateById = (id, accessory, result) => {
       ],
       (err, res) => {
         if (err) {
-            console.log("error: ", err);
+            console.log("error::Accessory.updateById", err);
             result(null, err);
             return;
         }
@@ -130,7 +130,7 @@ Accessory.remove = (id, result) => {
   pool.getConnection((err, connection) => {
     connection.query('DELETE FROM accessories WHERE accessory_id = ?', id, (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.log("error::Accessory.remove ", err);
         result(null, err);
         return;
       }
@@ -141,7 +141,7 @@ Accessory.remove = (id, result) => {
         return;
       }
   
-      console.log("deleted accessory with id: ", id);
+      console.log("Accessory.remove:: ", id);
       result(null, res);
       connection.release();
     });
