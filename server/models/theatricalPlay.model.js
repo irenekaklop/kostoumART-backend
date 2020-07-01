@@ -7,12 +7,13 @@ const TheatricalPlay = function (theatricalPlay) {
     this.theater = theatricalPlay.theater;
     this.years = theatricalPlay.years;
     this.actors = theatricalPlay.actors;
-    this.userId = theatricalPlay.userId;
+    this.createdBy = theatricalPlay.createdBy;
 }
 
 TheatricalPlay.create = (newTheatricalPlay, result) => {
   pool.getConnection((err, connection) => {
-    connection.query( `INSERT INTO theatrical_plays SET ?`, newTheatricalPlay, (err, res) => {
+    connection.query( `INSERT INTO theatrical_plays SET title=?, years=?, actors=?, director=?, theater=?, createdBy=(select user_id from users where username = ?)`,
+    [newTheatricalPlay.title, newTheatricalPlay.years, newTheatricalPlay.actors, newTheatricalPlay.director, newTheatricalPlay.theater, newTheatricalPlay.createdBy], (err, res) => {
         if (err) {
           console.log("error::TheatricalPlay.create ", err);
           result(err, null);
@@ -50,7 +51,9 @@ TheatricalPlay.findById = (theatricalPlayId, result) => {
 
 TheatricalPlay.getAll = (AuthUser, result) => {
   pool.getConnection((err, connection) => {
-    connection.query("SELECT *, users.username as createdBy FROM theatrical_plays left join users on theatrical_plays.userId=users.user_id;", (err, res) => {
+    connection.query("SELECT *, users.username as createdBy FROM theatrical_plays join (SELECT user_id FROM users where role <= ?) S2 ON theatrical_plays.createdBy = S2.user_id left join users on theatrical_plays.createdBy=users.user_id",
+    [AuthUser],
+    (err, res) => {
         if (err) {
           console.log("error::TheatricalPlay.getAll ", err);
           result(null, err);

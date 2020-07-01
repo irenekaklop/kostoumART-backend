@@ -7,12 +7,14 @@ const Use = function(use) {
     this.description = use.description;
     this.descriptionHtml = use.descriptionHtml;
     this.customs = use.customs;
-    this.userId = use.userId;
+    this.createdBy = use.createdBy;
 }
 
 Use.create = (newUse, result) => {
   pool.getConnection((err, connection) => {
-    connection.query( `INSERT INTO uses SET ?`, newUse, (err, res) => {
+    connection.query( 'INSERT INTO uses SET name=?, description=?, use_category=?, customs=?, descriptionHtml=?, createdBy = (select user_id from users where username = ?)', 
+    [newUse.name, newUse.description, newUse.use_category, newUse.customs, newUse.descriptionHtml, newUse.createdBy], 
+    (err, res) => {
       if (err) {
         console.log("error::Use.create ", err);
         result(err, null);
@@ -49,7 +51,9 @@ Use.findById = (useId, result) => {
 
 Use.getAll = (AuthUser, result) => {
   pool.getConnection((err, connection) => {
-    connection.query("SELECT *, users.username as createdBy FROM theaterdb.uses left join users on uses.userId=users.user_id;", (err, res) => {
+    connection.query("SELECT *, users.username as createdBy FROM theaterdb.uses join (SELECT user_id FROM users where role <= ?) S2 ON uses.createdBy = S2.user_id left join users on uses.createdBy=users.user_id ", 
+    [AuthUser],
+    (err, res) => {
       if (err) {
         console.log("error::Use.getAll ", err);
         result(null, err);

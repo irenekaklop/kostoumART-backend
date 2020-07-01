@@ -22,7 +22,7 @@ exports.create = (req, res) => {
         actors: req.body.data.actors.value, 
         director: req.body.data.director.value, 
         theater: req.body.data.theater.value, 
-        userId: req.body.userId 
+        createdBy: req.body.createdBy
     })
     
     // Save Item in the database
@@ -38,7 +38,7 @@ exports.create = (req, res) => {
   
 // Retrieve all Items from the database.
 exports.findAll = (req, res) => {
-    let AuthUser = req.query.user;
+    let AuthUser = req.query.userType;
     TheatricalPlay.getAll( AuthUser, (err, data) => {
         if (err)
             res.status(500).send({
@@ -88,7 +88,7 @@ exports.update = (req, res) => {
         actors: req.body.data.actors.value, 
         director: req.body.data.director.value, 
         theater: req.body.data.theater.value, 
-        userId: req.body.userId 
+        createdBy: req.body.createdBy
     })
 
     TheatricalPlay.updateById( req.params.theatricalPlayId, theatricalPlay, (err, data) => {

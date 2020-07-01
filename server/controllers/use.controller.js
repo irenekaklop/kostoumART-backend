@@ -15,7 +15,7 @@ exports.create = (req, res) => {
         descriptionHtml: req.body.data.descriptionHtml.value,
         description: req.body.data.description.value, 
         customs: req.body.data.customs.value, 
-        userId: req.body.userId
+        createdBy: req.body.createdBy
     });
     
     // Save Item in the database
@@ -31,7 +31,7 @@ exports.create = (req, res) => {
   
 // Retrieve all Items from the database.
 exports.findAll = (req, res) => {
-    let AuthUser = req.query.user;
+    let AuthUser = req.query.userType;
     Use.getAll( AuthUser, (err, data) => {
         if (err)
             res.status(500).send({
@@ -73,7 +73,7 @@ exports.update = (req, res) => {
         description: req.body.data.description.value, 
         descriptionHtml: req.body.data.descriptionHtml.value,
         customs: req.body.data.customs.value, 
-        userId: req.body.userId
+        createdBy: req.body.createdBy
     });
 
     Use.updateById( req.params.useId, use, (err, data) => {

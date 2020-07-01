@@ -214,7 +214,6 @@ exports.filter = (req, res) => {
   }
 
   let AuthUser = req.query.userType;
-  console.log("AuthUser", AuthUser);
   let filters = req.query.filters;
   console.log("filters", filters)
   let technique=null;
