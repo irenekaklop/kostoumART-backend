@@ -21,6 +21,9 @@ var mysqlBackup = function() {
 						if ( err ) console.log('ERROR: ' + err + directory+file );
 					});
 				}
+
+				var filename = now.getFullYear() + "-"+ now.getMonth() + "-" + now.getDate() +'-databaseDump';
+				exec(`mysqldump -u${config.user} -p${config.password} ${config.database} > ${path.join(directory, filename)}.sql`);
 			});
 		}
 		else{
@@ -32,6 +35,9 @@ var mysqlBackup = function() {
 						if ( err ) console.log('ERROR: ' + err + directory+file );
 					});
 				}
+
+				var filename = now.getFullYear() + "-"+ now.getMonth() + "-" + now.getDate() +'-databaseDump';
+				exec(`mysqldump -u${config.user} -p${config.password} ${config.database} > ${path.join(directory, filename)}.sql`);
 			});
 		}
 	}
@@ -41,15 +47,16 @@ var mysqlBackup = function() {
 		  
 			for (const file of files) {
 				if(file!=='weeklyDatabaseDump.sql'){
-					fs.unlinkSync(path.join(directory, file), err => {
-						if (err) throw err;
-					});
+					fs.unlinkSync(path.join(directory, file));
 				}
 			}
+
+			var filename = now.getFullYear() + "-"+ now.getMonth() + "-" + now.getDate() +'-databaseDump';
+			exec(`mysqldump -u${config.user} -p${config.password} ${config.database} > ${path.join(directory, filename)}.sql`);
+		
 		});
+	
 	}
-	var filename = now.getFullYear() + "-"+ now.getMonth() + "-" + now.getDate() +'-databaseDump';
-	exec(`mysqldump -u${config.user} -p${config.password} ${config.database} > ${path.join(directory, filename)}.sql`);
 };
 
 module.exports = mysqlBackup;
