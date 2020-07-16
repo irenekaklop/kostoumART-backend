@@ -16,11 +16,11 @@ Use.create = (newUse, result) => {
     [newUse.name, newUse.description, newUse.use_category, newUse.customs, newUse.descriptionHtml, newUse.createdBy], 
     (err, res) => {
       if (err) {
-        console.log("error::Use.create ", err);
+        console.error("Use.create ", err);
         result(err, null);
         return;
       }
-      console.log("created use: ", { id: res.insertId, ...newUse });
+      console.log("created use: ", { id: res.insertId });
       result(null, { id: res.insertId, ...newUse });
       connection.release();
     });
@@ -31,13 +31,13 @@ Use.findById = (useId, result) => {
   pool.getConnection((err, connection) => {
     connection.query(`SELECT * FROM uses WHERE useID= ${useId}`, (err, res) => {
       if (err) {
-        console.log("error::Use.findById ", err);
+        console.error("Use.findById ", err);
         result(err, null);
         return;
       }
     
       if (res.length) {
-        console.log("found use: ", res[0]);
+        console.log("found use: ", useId);
         result(null, res[0]);
         return;
       }
@@ -55,7 +55,7 @@ Use.getAll = (AuthUser, result) => {
     [AuthUser],
     (err, res) => {
       if (err) {
-        console.log("error::Use.getAll ", err);
+        console.error("Use.getAll ", err);
         result(null, err);
         return;
       }
@@ -71,7 +71,7 @@ Use.updateById = (id, use, result) => {
       `UPDATE uses SET ? WHERE useID=${id}`, use,
       (err, res) => {
         if (err) {
-          console.log("error::Use.updateById ", err);
+          console.error("Use.updateById ", err);
           result(null, err);
           return;
         }
@@ -82,7 +82,7 @@ Use.updateById = (id, use, result) => {
           return;
         }
     
-        console.log("updated use: ", { id: id, ...use });
+        console.log("updated use: ", { id: id });
         result(null, { id: id, ...use });
         connection.release();
     });
@@ -93,7 +93,7 @@ Use.remove = (id, result) => {
   pool.getConnection((err, connection) => {
     connection.query('DELETE FROM uses WHERE useID = ?', id, (err, res) => {
       if (err) {
-        console.log("error::Use.remove ", err);
+        console.error("Use.remove ", err);
         result(null, err);
         return;
       }

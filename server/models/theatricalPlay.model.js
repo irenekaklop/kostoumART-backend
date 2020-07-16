@@ -15,11 +15,11 @@ TheatricalPlay.create = (newTheatricalPlay, result) => {
     connection.query( `INSERT INTO theatrical_plays SET title=?, years=?, actors=?, director=?, theater=?, createdBy=(select user_id from users where username = ?)`,
     [newTheatricalPlay.title, newTheatricalPlay.years, newTheatricalPlay.actors, newTheatricalPlay.director, newTheatricalPlay.theater, newTheatricalPlay.createdBy], (err, res) => {
         if (err) {
-          console.log("error::TheatricalPlay.create ", err);
+          console.error("TheatricalPlay.create ", err);
           result(err, null);
           return;
         }
-        console.log("created theatrical play: ", { id: res.insertId, ...newTheatricalPlay });
+        console.log("created theatrical play: ", { id: res.insertId });
         result(null, { id: res.insertId, ...newTheatricalPlay });
         connection.release();
     });
@@ -30,13 +30,13 @@ TheatricalPlay.findById = (theatricalPlayId, result) => {
   pool.getConnection((err, connection) => {
     connection.query(`SELECT * FROM theatrical_plays WHERE theatrical_play_id= ${theatricalPlayId}`, (err, res) => {
         if (err) {
-          console.log("error::TheatricalPlay.findById ", err);
+          console.error("TheatricalPlay.findById ", err);
           result(err, null);
           return;
         }
       
         if (res.length) {
-          console.log("found theatrical play: ", res[0]);
+          console.log("found theatrical play: ", theatricalPlayId);
           result(null, res[0]);
           return;
         }
@@ -55,12 +55,10 @@ TheatricalPlay.getAll = (AuthUser, result) => {
     [AuthUser],
     (err, res) => {
         if (err) {
-          console.log("error::TheatricalPlay.getAll ", err);
+          console.error("TheatricalPlay.getAll ", err);
           result(null, err);
           return;
         }
-      
-        //console.log("theatrical plays: ", res);
         result(null, res);
         connection.release();
     });
@@ -73,7 +71,7 @@ TheatricalPlay.updateById = (id, theatricalPlay, result) => {
         `UPDATE theatrical_plays SET ? WHERE theatrical_play_id=${id}`, theatricalPlay,
         (err, res) => {
           if (err) {
-            console.log("error::TheatricalPlay.updateById ", err);
+            console.error("TheatricalPlay.updateById ", err);
             result(null, err);
             return;
           }
@@ -95,7 +93,7 @@ TheatricalPlay.remove = (id, result) => {
   pool.getConnection((err, connection) => {
     connection.query('DELETE FROM theatrical_plays WHERE theatrical_play_id = ?', id, (err, res) => {
         if (err) {
-          console.log("error::TheatricalPlay.remove ", err);
+          console.error("TheatricalPlay.remove ", err);
           result(null, err);
           return;
         }

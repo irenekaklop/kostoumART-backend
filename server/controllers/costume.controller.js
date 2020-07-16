@@ -1,5 +1,5 @@
 const Costume = require("../models/costume.model.js");
-const {saveImage, removeImage} = require("../utils");
+const {saveImage, removeImage} = require("../utils/utils.js");
 
 // Create and Save a new Costume
 exports.create = (req, res) => {
@@ -204,56 +204,6 @@ exports.delete = (req, res) => {
       });
 };
 
-//Filter the costumes according to the params
-exports.filter = (req, res) => {
-  // Validate Request
-  if (!req.query) {
-    res.status(400).send({
-      message: "Content can not be empty!"
-    });
-  }
-
-  let AuthUser = req.query.userType;
-  let filters = req.query.filters;
-  console.log("filters", filters)
-  let technique=null;
-  let sex=null;
-  filters.forEach(filter => {
-    if(filter.name==="technique"){
-      console.log(filter.name);
-      if(filter.value){
-        technique=[];
-        filter.value.forEach(element => {
-          technique.push(element.name);
-        });
-      }
-    }
-    else if(filter.name==="sex"){
-      if(filter.value){
-        sex=[];
-        filter.value.forEach(element => {
-          sex.push(element.name);
-        })
-      }
-    }
-  });
-  console.log("f", technique, sex)
-  Costume.filter(sex, technique, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        res.status(404).send({
-          message: "Could not filter Costumes."
-        });
-      } else {
-        res.status(500).send({
-          message: "Could not filter Costumes."
-        });
-      }
-    } else res.send(data);
-  });
-}
-
 exports.getFile = (req, res) => {
-  console.log(req.body);
   res.sendFile(req.body.path, { root: __dirname });
 }

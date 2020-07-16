@@ -32,10 +32,12 @@ exports.signin = (req, res) => {
         res.status(200).send(token);
       }
       else{
+        console.log(`User ${req.body.email} tried to login, wrong password`)
         res.status(400).send({ message: "Wrong password" })
       }
     } 
     else {
+      console.log(`User ${req.body.email} tried to login, user doesn't exists`)
       res.status(404).send({ message: "User doesn't exists" })
     }
     }) 
