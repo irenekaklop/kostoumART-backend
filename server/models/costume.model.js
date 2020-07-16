@@ -146,3 +146,5 @@ Costume.remove = (id, result) => {
     });
   })
 };
+
+module.exports = Costume;
