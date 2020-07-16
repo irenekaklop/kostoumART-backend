@@ -36,12 +36,12 @@ Costume.create = (costume, result) => {
         costume.createdBy ],
       (err, res) => {
         if (err) {
-          console.log("error: ", err);
+          console.error("error: ", err);
           result(err, null);
           return;
         }
   
-      console.log("created costume: ", { id: res.insertId, ...costume });
+      console.log("created costume: ", { id: res.insertId });
       result(null, { id: res.insertId, ...costume });
       conn.release(); 
     });
@@ -52,13 +52,13 @@ Costume.findById = (costumeId, result) => {
   pool.getConnection((err, conn) => {
     conn.query(`SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, costumes.material, costumes.technique,costumes.date, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes LEFT JOIN uses ON costumes.useID = uses.useID LEFT JOIN theatrical_plays ON costumes.theatrical_play_id=theatrical_plays.theatrical_play_id WHERE costume_id= ?`, [costumeId], (err, res) => {
       if (err) {
-        console.log("error: ", err);
+        console.error("Costume.findById: ", err);
         result(err, null);
         return;
       }
   
       if (res.length) {
-        console.log("found costume: ", res[0]);
+        console.log("found costume: ", costumeId);
         result(null, res[0]);
         return;
       }
@@ -81,12 +81,10 @@ Costume.getAll = (AuthUser, result) => {
     [AuthUser],
     (err, res) => {
       if (err) {
-        console.log("error::Costume.getAll ", err);
+        console.error("Costume.getAll ", err);
         result(null, err);
         return;
       }
-  
-      //console.log("costumes: ", res);
       result(null, res);
       connection.release();
     });
@@ -108,7 +106,7 @@ Costume.updateById = (id, costume, result) => {
       ,
         (err, res) => {
           if (err) {
-              console.log("error::Costume.updateById", err);
+              console.error("Costume.updateById", err);
               result(null, err);
               return;
           }
@@ -119,7 +117,7 @@ Costume.updateById = (id, costume, result) => {
             return;
           }
     
-          console.log("updated costume: ", { id: id, ...costume });
+          console.log("updated costume: ", { id: id});
           result(null, { id: id, ...costume });
           conn.release();
         }
@@ -131,7 +129,7 @@ Costume.remove = (id, result) => {
   pool.getConnection((err, conn) => {
     conn.query("DELETE FROM costumes WHERE costume_id = ?", id, (err, res) => {
       if (err) {
-        console.log("error::Costume.remove ", err);
+        console.error("Costume.remove ", err);
         result(null, err);
         return;
       }
@@ -149,59 +147,4 @@ Costume.remove = (id, result) => {
   })
 };
 
-Costume.filter = (sex, technique, result) => {
-  let query = `SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.date, costumes.useID, costumes.sex, 
-  uses.name as use_name, costumes.createdBy, costumes.material, costumes.technique, 
-  costumes.location, costumes.designer, costumes.theatrical_play_id, 
-  theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes 
-  JOIN (SELECT user_id FROM users where role <= 1) S2 ON costumes.createdBy = S2.user_id 
-  left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id 
-  left join uses ON costumes.useID = uses.useID`
-  if(technique || sex){
-    query = query + " WHERE ("
-  }
-  if(technique){
-    for(var i=0; i<technique.length; i++){
-      if(i>0){
-        query= query + " || "
-      }
-      query = query +"technique='"+ technique[i] + "'";
-    }
-    query = query + ')'
-  }
-  if(technique&&sex){
-    query = query + ' && (';
-  }
-  if(sex){
-    for(var i=0; i<sex.length; i++){
-      if(i>0){
-        query = query + " || "
-      }
-      query = query +"sex LIKE'%"+ sex[i] + "%'";
-    }
-    query=query+')'
-  }
-  pool.getConnection((err, conn) => {
-    conn.query(query, (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
-
-      if (res.affectedRows == 0) {
-        // not found Costume with the id
-        result({ kind: "not_found" }, null);
-        return;
-      }
-
-      console.log("Filter succeed");
-      result(null, res);
-      conn.release();
-    })
-  })
-  console.log("FILTERS", query);
-}
-
-  
 module.exports = Costume;

@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const {infoLogger, errorLogger} = require('./utils/logger.js')
 const cors = require("cors");
 const fs = require("fs");
 const cron = require("node-cron");
@@ -36,8 +37,8 @@ require("./routes/routes.js")(app);
 require('./routes/users.routes')(app);
 
 // schedule daily DB backup at 11pm
-cron.schedule("* 23 * * *", function() {
-  console.log("Daily back up of the database");
+cron.schedule("* 7 * * *", function() {
+  console.log("Back up of the database started");
   mysqlBackup();
 });
 
@@ -52,7 +53,6 @@ app.get('/dependencies', (req, res) => {
     let index = req.query.index;
     let column = req.query.column;
     let query;
-    console.log(req.query);
     if(column==="use"){
       query= "SELECT (SELECT EXISTS (select * FROM costumes where useID=?)) OR (SELECT EXISTS (select * FROM accessories where useID=?)) as result"
       pool.getConnection((err, conn)=> {

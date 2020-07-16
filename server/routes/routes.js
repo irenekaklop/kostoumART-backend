@@ -15,8 +15,6 @@ module.exports = app => {
   
     app.delete("/costumes/:costumeId", costumes.delete);
 
-    app.get("/costumes-filters", costumes.filter);
-
     app.get("/costumeImage", costumes.getFile);
 
     // Accessories

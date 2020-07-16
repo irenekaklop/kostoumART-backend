@@ -2,7 +2,6 @@ const fs = require('fs');
 
 /*Save the base64 image in the server and returns the filename and path of image.*/
 function saveImage(baseImage) {
-    console.log("DIRECTORY", __dirname)
     const localPath = __dirname + '/uploads/images/';
     //Find extension of file
     const ext = baseImage.substring(baseImage.indexOf("/")+1, baseImage.indexOf(";base64"));
@@ -22,10 +21,9 @@ function saveImage(baseImage) {
 
 function removeImage(path) {
     if(path){
-        console.log("Removing", './server/' + path)
         fs.unlink('./server/' + path, function(error){
             if (error) {
-                console.log('Failed to delete file.', error);
+                console.error('Failed to delete image file.', error);
             }
         })
         return;

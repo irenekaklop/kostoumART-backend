@@ -1,5 +1,5 @@
 const Accessory = require("../models/accessory.model.js");
-const {saveImage, removeImage} = require("../utils");
+const {saveImage, removeImage} = require("../utils/utils.js");
 
 // Create and Save a new Item
 exports.create = (req, res) => {
