@@ -75,7 +75,8 @@ Costume.getAll = (AuthUser, result) => {
     connection.query(
       `SELECT costumes.costume_id, costumes.costume_name, costumes.description, costumes.descriptionHtml, costumes.images, costumes.date, 
       costumes.useID, costumes.sex, uses.name as use_name, uses.use_category, users.username as createdBy, costumes.material,
-      costumes.technique, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, costumes.actors FROM costumes 
+      costumes.technique, costumes.location, costumes.designer, costumes.theatrical_play_id, theatrical_plays.title as tp_title, costumes.parts, 
+	costumes.actors FROM costumes 
       JOIN (SELECT user_id FROM users where role <= ?) S2 ON costumes.createdBy = S2.user_id left join users on costumes.createdBy=users.user_id 
       left join theatrical_plays on costumes.theatrical_play_id=theatrical_plays.theatrical_play_id left join uses ON costumes.useID = uses.useID`,
     [AuthUser],
