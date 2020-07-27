@@ -10,4 +10,8 @@ module.exports = function(app) {
   });
 
   app.post('/login', controller.signin);
+  app.post('/sendResetMail', controller.sendResetEmail);
+  app.get('/reset', controller.reset);
+  app.post('/updatePassword', controller.updatePassword);
+  app.post('/register', controller.register);
 }

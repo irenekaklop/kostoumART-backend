@@ -19,7 +19,13 @@ module.exports = (sequelize, Sequelize) => {
     },
     lastLogin: {
       type: Sequelize.DATE
-    }
+    },
+    resetPasswordToken: {
+      type: Sequelize.STRING
+    },
+    resetPasswordExpires: {
+      type: Sequelize.DATE
+    },
   },
   {
     timestamps: false
