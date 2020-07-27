@@ -178,9 +178,9 @@ exports.register = (req, res) => {
       res.status(400).send({message: 'user already exists in db'});
     }
     else{
-      User.create(user)
+      User.create(userData)
       .then(response => {
-        console.log(`${user.email} was registered`);
+        console.log(`${userData.email} was registered`);
         res.status(200).send({message: 'OK'})
       })
       .catch(error => {
