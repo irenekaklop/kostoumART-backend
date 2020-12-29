@@ -74,6 +74,8 @@ exports.update = (req, res) => {
         message: "Content can not be empty!"
     });}
 
+    console.log("req.body", req.body)
+
     let _yearsStr = '';
     for (let i=0; i < req.body.data.years.value.length; i++){
       _yearsStr = _yearsStr + req.body.data.years.value[i].value;
@@ -90,6 +92,7 @@ exports.update = (req, res) => {
         theater: req.body.data.theater.value, 
         createdBy: req.body.createdBy
     })
+
 
     TheatricalPlay.updateById( req.params.theatricalPlayId, theatricalPlay, (err, data) => {
         if (err) {

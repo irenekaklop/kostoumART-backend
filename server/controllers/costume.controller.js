@@ -169,6 +169,7 @@ exports.update = (req, res) => {
     theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
     parts: req.body.data.parts.value,
     images: imagesObj,
+    createdBy: req.body.createdBy
   });
 
 

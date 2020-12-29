@@ -98,11 +98,12 @@ Costume.updateById = (id, costume, result) => {
       descriptionHtml = ?, date= ? , technique= ?, sex= ?, 
       material= ?, actors= ?, location= ?, designer= ?, images= ?,
       useID= ( SELECT useID FROM uses WHERE name = ? AND use_category = ?), 
-      theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?) 
+      theatrical_play_id = ( SELECT theatrical_play_id FROM theatrical_plays WHERE title = ?),
+      createdBy = (select user_id from users where username = ?)
       WHERE costume_id=?`,
       [costume.costume_name, costume.description, costume.descriptionHtml, costume.date, costume.technique, costume.sex,
         costume.material, costume.actors, costume.location, costume.designer, JSON.stringify(costume.images),
-        costume.useName, costume.useCategory, costume.theatricalPlayName, id]
+        costume.useName, costume.useCategory, costume.theatricalPlayName, costume.createdBy, id]
       ,
         (err, res) => {
           if (err) {

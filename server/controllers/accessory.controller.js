@@ -151,8 +151,8 @@ exports.update = (req, res) => {
         location: req.body.data.location.value,
         designer: req.body.data.designer.value,
         theatricalPlayName: (req.body.data.selectedTPOption.valid ? req.body.data.selectedTPOption.value : null ),
-        images: imagesObj
-        
+        images: imagesObj,
+        createdBy: req.body.createdBy
     });
 
     Accessory.updateById( req.params.accessoryId, accessory, (err, data) => {

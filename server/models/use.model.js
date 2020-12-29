@@ -68,7 +68,9 @@ Use.getAll = (AuthUser, result) => {
 Use.updateById = (id, use, result) => {
   pool.getConnection((err, connection) => {
     connection.query(
-      `UPDATE uses SET ? WHERE useID=${id}`, use,
+      `UPDATE uses SET name=?, use_category=?, descriptionHTML=?, customs=?, 
+      createdBy = (select user_id from users where username = ?) WHERE useID=?`, 
+      [use.name, use.use_category, use.descriptionHtml, use.customs, use.createdBy, id],
       (err, res) => {
         if (err) {
           console.error("Use.updateById ", err);

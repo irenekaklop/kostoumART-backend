@@ -68,7 +68,9 @@ TheatricalPlay.getAll = (AuthUser, result) => {
 TheatricalPlay.updateById = (id, theatricalPlay, result) => {
   pool.getConnection((err, connection) => {
     connection.query(
-        `UPDATE theatrical_plays SET ? WHERE theatrical_play_id=${id}`, theatricalPlay,
+        `UPDATE theatrical_plays SET title=?, years=?, actors=?, director=?, theater=?,
+        createdBy = (select user_id from users where username = ?) WHERE theatrical_play_id=?`, 
+        [theatricalPlay.title, theatricalPlay.years, theatricalPlay.actors, theatricalPlay.director, theatricalPlay.theater, theatricalPlay.createdBy, id],
         (err, res) => {
           if (err) {
             console.error("TheatricalPlay.updateById ", err);
